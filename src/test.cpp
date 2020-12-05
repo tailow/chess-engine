@@ -1,4 +1,6 @@
-int getValue()
+#include "test.h"
+
+int printValue(int value)
 {
-    return 5;
+    return value;
 }

@@ -1,12 +1,10 @@
 #include <iostream>
 #include "test.cpp"
 
-int main(int, char **)
+int main()
 {
     std::cout << "Hello, world!\n";
-    std::cout << getValue();
+    std::cout << printValue(5);
 
-    int yo;
-
-    std::cin >> yo;
+    std::cin.get();
 }
