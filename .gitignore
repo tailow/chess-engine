@@ -1,4 +1,4 @@
-CMakeLists.txt.user
+CMakeLists.txt
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
@@ -10,6 +10,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
+build
 
 # Prerequisites
 *.d
@@ -44,7 +45,7 @@ _deps
 *.out
 *.app
 
-
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
