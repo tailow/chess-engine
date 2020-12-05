@@ -1,2 +1,0 @@
-C:\Projects\C++\lichess-bot\bot\engines\SeggzEngine\Debug\SeggzEngine.exe
-C:\Projects\C++\lichess-bot\bot\engines\SeggzEngine\Debug\SeggzEngine.pdb
