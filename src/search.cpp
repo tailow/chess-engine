@@ -5,32 +5,7 @@
 
 using namespace std;
 
-int depth = 2;
-
-thc::Move search(thc::ChessRules board)
-{
-    thc::Move bestMove;
-    double bestEval;
-
-    vector<thc::Move> legalMoves;
-
-    board.GenLegalMoveList(legalMoves);
-
-    for (int i = 0; i < legalMoves.size(); i++)
-    {
-        if (board.white)
-        {
-            thc::ChessRules child = board;
-            child.PlayMove(legalMoves.at(i));
-
-            if (alphabeta(child, depth, -100000, 100000, true))
-            {
-            }
-        }
-    }
-
-    return bestMove;
-}
+int depth = 1;
 
 double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
 {
@@ -88,4 +63,59 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
 
         return value;
     }
+}
+
+thc::Move search(thc::ChessRules board)
+{
+    thc::Move bestMove;
+
+    vector<thc::Move> legalMoves;
+
+    double bestEvaluation;
+
+    if (board.white)
+    {
+        bestEvaluation = -1000000;
+    }
+
+    else
+    {
+        bestEvaluation = 1000000;
+    }
+
+    board.GenLegalMoveList(legalMoves);
+
+    for (int i = 0; i < legalMoves.size(); i++)
+    {
+        thc::ChessRules child = board;
+        child.PlayMove(legalMoves.at(i));
+
+        if (board.white)
+        {
+            double evaluation = alphabeta(child, depth, 100000, -100000, false);
+
+            cout << "evaluation for move " << legalMoves.at(i).NaturalOut(&board) << ": " << evaluation << endl;
+
+            if (evaluation > bestEvaluation)
+            {
+                bestMove = legalMoves.at(i);
+                bestEvaluation = evaluation;
+            }
+        }
+
+        else
+        {
+            double evaluation = alphabeta(child, depth, -100000, 100000, true);
+
+            if (evaluation < bestEvaluation)
+            {
+                bestMove = legalMoves.at(i);
+                bestEvaluation = evaluation;
+            }
+        }
+    }
+
+    //cout << "info score " << bestEvaluation << endl;
+
+    return bestMove;
 }

@@ -1,11 +1,15 @@
 #include "../lib/thc/thc.h"
+#include <iostream>
+
 using namespace std;
+
 double evaluate(thc::ChessRules board)
 {
     double evaluation;
     double score;
     double bscore;
 
+    /*
     for (square = a8; square <= h1; ++square)
     {
 
@@ -57,8 +61,11 @@ double evaluate(thc::ChessRules board)
             }
             }
         }
+        */
 
-        evaluation = score - bscore;
+    //evaluation = score - bscore;
 
-        return evaluation;
-    }
+    evaluation = rand() % 50 - 25;
+
+    return evaluation;
+}

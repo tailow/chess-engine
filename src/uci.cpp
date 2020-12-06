@@ -2,7 +2,7 @@
 #include <string>
 #include "../lib/thc/thc.h"
 #include "search.h"
-#include "evalutate.h"
+#include "evaluate.h"
 
 using namespace std;
 
@@ -52,9 +52,9 @@ void loop()
 
         else if (split(input, " ").at(0) == "go")
         {
-            string bestMove = "bestmove " + search(board).c_str() + "\n";
+            string bestMove = "bestmove " + search(board).TerseOut() + "\n";
 
-            printf(bestMove);
+            printf(bestMove.c_str());
         }
 
         else if (split(input, " ").at(0) == "position")
@@ -64,31 +64,31 @@ void loop()
             if (strings.at(1) == "startpos")
             {
                 board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            }
 
-                if (strings.size() > 3)
+            if (strings.size() > 3)
+            {
+                if (strings.at(2) == "moves")
                 {
-                    if (strings.at(2) == "moves")
+                    for (int i = 3; i < strings.size(); i++)
                     {
-                        for (int i = 3; i < strings.size(); i++)
-                        {
-                            thc::Move move;
-                            move.TerseIn(&board, strings.at(i).c_str());
+                        thc::Move move;
+                        move.TerseIn(&board, strings.at(i).c_str());
 
-                            board.PlayMove(move);
-                        }
+                        board.PlayMove(move);
+                    }
+                }
+
+                else
+                {
+                    string fen;
+
+                    for (int i = 1; i < strings.size(); i++)
+                    {
+                        fen += strings.at(i) + " ";
                     }
 
-                    else
-                    {
-                        string fen;
-
-                        for (int i = 1; i < strings.size(); i++)
-                        {
-                            fen += strings.at(i) + " ";
-                        }
-
-                        board.Forsyth(fen.c_str());
-                    }
+                    board.Forsyth(fen.c_str());
                 }
             }
         }

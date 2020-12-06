@@ -3,4 +3,4 @@
 
 using namespace std;
 
-int evaluate(thc::ChessRules board);
+double evaluate(thc::ChessRules board);

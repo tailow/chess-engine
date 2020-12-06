@@ -5,7 +5,9 @@ add_executable(seggz ./src/main.cpp
                      ./src/uci.cpp
                      ./src/uci.h
                      ./src/search.cpp
-                     ./src/search.h)
+                     ./src/search.h
+                     ./src/evaluate.cpp 
+                     ./src/evaluate.h)
 add_library(thc 
             ./lib/thc/thc.cpp 
             ./lib/thc/thc.h)

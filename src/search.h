@@ -3,4 +3,4 @@
 
 using namespace std;
 
-string search(thc::ChessRules board);
+thc::Move search(thc::ChessRules board);
