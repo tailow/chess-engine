@@ -5,20 +5,18 @@
 
 using namespace std;
 
-int depth = 1;
+int depth = 2;
 
 double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
 {
-    if (depth == 0)
-    {
-        return evaluate(board);
-    }
-
-    thc::Move move;
-
     vector<thc::Move> legalMoves;
 
     board.GenLegalMoveList(legalMoves);
+
+    if (depth == 0 || legalMoves.size() == 0)
+    {
+        return evaluate(board);
+    }
 
     if (maximizing)
     {
@@ -90,13 +88,19 @@ thc::Move search(thc::ChessRules board)
         thc::ChessRules child = board;
         child.PlayMove(legalMoves.at(i));
 
-        if (board.white)
+        double evaluation;
+
+        if (child.white)
         {
-            double evaluation = alphabeta(child, depth, 100000, -100000, false);
+            evaluation = alphabeta(child, depth, -100000, 100000, true);
 
-            cout << "evaluation for move " << legalMoves.at(i).NaturalOut(&board) << ": " << evaluation << endl;
+            if (evaluation < bestEvaluation)
+            {
+                bestMove = legalMoves.at(i);
+                bestEvaluation = evaluation;
+            }
 
-            if (evaluation > bestEvaluation)
+            else if (evaluation == bestEvaluation && (rand() % 100) < 25)
             {
                 bestMove = legalMoves.at(i);
                 bestEvaluation = evaluation;
@@ -105,17 +109,23 @@ thc::Move search(thc::ChessRules board)
 
         else
         {
-            double evaluation = alphabeta(child, depth, -100000, 100000, true);
+            evaluation = alphabeta(child, depth, 100000, -100000, false);
 
-            if (evaluation < bestEvaluation)
+            if (evaluation > bestEvaluation)
+            {
+                bestMove = legalMoves.at(i);
+                bestEvaluation = evaluation;
+            }
+
+            else if (evaluation == bestEvaluation && (rand() % 100) < 25)
             {
                 bestMove = legalMoves.at(i);
                 bestEvaluation = evaluation;
             }
         }
-    }
 
-    //cout << "info score " << bestEvaluation << endl;
+        cout << "evaluation for move " << legalMoves.at(i).NaturalOut(&board) << ": " << evaluation << endl;
+    }
 
     return bestMove;
 }
