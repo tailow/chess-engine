@@ -3,13 +3,12 @@ using namespace std;
 int evaluate(thc::ChessRules board)
 {
     int evaluation;
-    vector <thc::Move> legalMoves;
-    vector <thc::Move> goodmoves;
+    vector<thc::Move> legalMoves;
+    vector<thc::Move> goodmoves;
 
     board.GenLegalMoveList(legalMoves);
 
     board.white()
 
-    
-    return evaluation;
+        return evaluation;
 }

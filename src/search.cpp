@@ -5,40 +5,87 @@
 
 using namespace std;
 
-string search(thc::ChessRules board)
+int depth = 2;
+
+thc::Move search(thc::ChessRules board)
 {
+    thc::Move bestMove;
+    double bestEval;
+
+    vector<thc::Move> legalMoves;
+
+    board.GenLegalMoveList(legalMoves);
+
+    for (int i = 0; i < legalMoves.size(); i++)
+    {
+        if (board.white)
+        {
+            thc::ChessRules child = board;
+            child.PlayMove(legalMoves.at(i));
+
+            if (alphabeta(child, depth, -100000, 100000, true))
+            {
+            }
+        }
+    }
+
+    return bestMove;
+}
+
+double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
+{
+    if (depth == 0)
+    {
+        return evaluate(board);
+    }
+
     thc::Move move;
 
     vector<thc::Move> legalMoves;
 
     board.GenLegalMoveList(legalMoves);
 
-    /*
-    for (int i = 0; i < legalMoves.size(); i++)
+    if (maximizing)
     {
-        cout << legalMoves.at(i).NaturalOut(&board) << endl;
-    }
-    */
-   
+        double value = -100000;
 
-/*
-       
-    for (int i =0; i<legalMoves.size(); i++)
+        for (int i = 0; i < legalMoves.size(); i++)
+        {
+            thc::ChessRules child = board;
+            child.PlayMove(legalMoves.at(i));
+
+            value = max(value, alphabeta(child, depth - 1, alpha, beta, false));
+
+            alpha = max(alpha, value);
+
+            if (alpha >= beta)
+            {
+                break;
+            }
+        }
+
+        return value;
+    }
+
+    else
     {
-        if (board.AttackedSquare(legalMoves[i].dst, true))
+        double value = 100000;
+
+        for (int i = 0; i < legalMoves.size(); i++)
         {
-            
+            thc::ChessRules child = board;
+            child.PlayMove(legalMoves.at(i));
+
+            value = min(value, alphabeta(child, depth - 1, alpha, beta, true));
+
+            beta = min(beta, value);
+
+            if (beta <= alpha)
+            {
+                break;
+            }
         }
-        else
-        {
-            goodmoves.push_back(legalMoves[i]);
-        }
+
+        return value;
     }
-    */
-
-    move = at(rand() % legalMoves.size());
-
-    string bestMove = "bestmove " + move.TerseOut() + "\n";
-
-    return bestMove;
 }

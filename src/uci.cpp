@@ -52,7 +52,9 @@ void loop()
 
         else if (split(input, " ").at(0) == "go")
         {
-            printf(evaluate.c_str());
+            string bestMove = "bestmove " + search(board).c_str() + "\n";
+
+            printf(bestMove);
         }
 
         else if (split(input, " ").at(0) == "position")
