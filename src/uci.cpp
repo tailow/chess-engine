@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "../lib/thc/thc.h"
+#include "search.h"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ vector<string> split(const string &str, const string &delim)
 
 void loop()
 {
-    thc::ChessRules rules;
+    thc::ChessRules board;
 
     while (true)
     {
@@ -50,20 +51,7 @@ void loop()
 
         else if (split(input, " ").at(0) == "go")
         {
-            thc::Move move;
-
-            vector<thc::Move> legalMoves;
-
-            rules.GenLegalMoveList(legalMoves);
-
-            for (int i = 0; i < legalMoves.size(); i++)
-            {
-                cout << legalMoves.at(i).NaturalOut(&rules) << endl;
-            }
-
-            move = legalMoves.at(rand() % legalMoves.size() + 0);
-
-            printf(("bestmove " + move.TerseOut() + "\n").c_str());
+            printf(search(board).c_str());
         }
 
         else if (split(input, " ").at(0) == "position")
@@ -72,7 +60,7 @@ void loop()
 
             if (strings.at(1) == "startpos")
             {
-                rules.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+                board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
                 if (strings.size() > 3)
                 {
@@ -81,9 +69,9 @@ void loop()
                         for (int i = 3; i < strings.size(); i++)
                         {
                             thc::Move move;
-                            move.TerseIn(&rules, strings.at(i).c_str());
+                            move.TerseIn(&board, strings.at(i).c_str());
 
-                            rules.PlayMove(move);
+                            board.PlayMove(move);
                         }
                     }
 
@@ -96,7 +84,7 @@ void loop()
                             fen += strings.at(i) + " ";
                         }
 
-                        rules.Forsyth(fen.c_str());
+                        board.Forsyth(fen.c_str());
                     }
                 }
             }
