@@ -2,6 +2,7 @@
 #include <string>
 #include "../lib/thc/thc.h"
 #include "search.h"
+#include "evalutate.h"
 
 using namespace std;
 
@@ -51,7 +52,7 @@ void loop()
 
         else if (split(input, " ").at(0) == "go")
         {
-            printf(search(board).c_str());
+            printf(evaluate.c_str());
         }
 
         else if (split(input, " ").at(0) == "position")
