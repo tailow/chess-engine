@@ -9,8 +9,14 @@ double evaluate(thc::ChessRules board)
     double score;
     double bscore;
 
+<<<<<<< Updated upstream
     /*
     for (square = a8; square <= h1; ++square)
+=======
+    
+
+    for( thc::Square=a8; thc::Square<=h1; ++thc::quare )
+>>>>>>> Stashed changes
     {
 
         char piece = squares[square];
