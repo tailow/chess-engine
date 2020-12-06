@@ -5,18 +5,12 @@ using namespace std;
 
 double evaluate(thc::ChessRules board)
 {
-    double evaluation;
+    double evaluation = 0;
     double score;
     double bscore;
 
-<<<<<<< Updated upstream
     /*
     for (square = a8; square <= h1; ++square)
-=======
-    
-
-    for( thc::Square=a8; thc::Square<=h1; ++thc::quare )
->>>>>>> Stashed changes
     {
 
         char piece = squares[square];
@@ -71,7 +65,73 @@ double evaluate(thc::ChessRules board)
 
     //evaluation = score - bscore;
 
-    evaluation = rand() % 50 - 25;
 
+    for(int i = 0; i<8; i++)
+    {
+        for(int j =0; j<8; j++)
+        {
+            switch(board.squares[i,j])
+            {
+            case 'P':
+            {
+                score = score + 1;
+                break;
+            }
+            case 'p':
+            {
+                bscore = bscore + 1;
+                break;
+            }
+            case 'N':
+            {
+                score = score + 3;
+                break;
+            }
+            case 'n':
+            {
+                bscore = bscore + 3;
+                break;
+            }
+            case 'B':
+            {
+                score = score + 3.5;
+                break;
+            }
+            case 'b':
+            {
+                bscore = bscore + 3.5 ;
+                break;
+            }
+            case 'R':
+            {
+                score = score + 5;
+                break;
+            }
+            case 'r':
+            {
+                bscore = bscore + 5 ;
+                break;
+            }
+            case 'Q':
+            {
+                score = score + 9;
+                break;
+            }
+            case 'q':
+            {
+                bscore = bscore + 9 ;
+                break;
+            }
+            case ' ':
+            {
+                break;
+            }
+            }
+        }
+    }
+
+    
+    evaluation = score-bscore;
+    cout << evaluation;
     return evaluation;
 }
