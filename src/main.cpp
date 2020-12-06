@@ -1,10 +1,7 @@
 #include <iostream>
-#include "test.cpp"
+#include "uci.h"
 
 int main()
 {
-    std::cout << "Hello, world!\n";
-    std::cout << printValue(5);
-
-    std::cin.get();
+    loop();
 }
