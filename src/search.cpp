@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int depth = 1;
+int depth = 3;
 
 double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
 {
@@ -45,8 +45,6 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
             }
         }
 
-        cout << "   white: " << maxMove.NaturalOut(&board) << " depth: " << depth << endl;
-
         return value;
     }
 
@@ -77,8 +75,6 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
             }
         }
 
-        cout << "   black: " << minMove.NaturalOut(&board) << " depth: " << depth << endl;
-
         return value;
     }
 }
@@ -103,7 +99,7 @@ thc::Move search(thc::ChessRules board)
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            evaluation = alphabeta(child, depth, 100000, -100000, false);
+            evaluation = alphabeta(child, depth, INT_MIN, INT_MAX, false);
 
             if (evaluation > bestEvaluation)
             {
@@ -117,7 +113,7 @@ thc::Move search(thc::ChessRules board)
                 bestEvaluation = evaluation;
             }
 
-            cout << "evaluation for line " << legalMoves.at(i).NaturalOut(&board) << ": " << evaluation << endl;
+            cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
         }
     }
 
@@ -130,7 +126,7 @@ thc::Move search(thc::ChessRules board)
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            evaluation = alphabeta(child, depth, -100000, 100000, true);
+            evaluation = alphabeta(child, depth, INT_MIN, INT_MAX, true);
 
             if (evaluation < bestEvaluation)
             {
@@ -144,7 +140,7 @@ thc::Move search(thc::ChessRules board)
                 bestEvaluation = evaluation;
             }
 
-            cout << "evaluation for line " << legalMoves.at(i).NaturalOut(&board) << ": " << evaluation << endl;
+            cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
         }
     }
 
