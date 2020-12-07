@@ -34,8 +34,6 @@ void go()
 
     string bestMove = "bestmove " + search(board).TerseOut() + "\n";
 
-    //cout << " currmove " << moveNumber << endl;
-
     cout << bestMove << endl;
 }
 
