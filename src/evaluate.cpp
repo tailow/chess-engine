@@ -8,9 +8,10 @@ double evaluate(thc::ChessRules board)
     double evaluation;
 
     vector<thc::Move> legalMoves;
+    bool wCheck;
+    bool bCheck;
 
     board.GenLegalMoveList(legalMoves);
-
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -67,9 +68,25 @@ double evaluate(thc::ChessRules board)
                 evaluation -= 9;
                 break;
             }
+            case 'K':
+            {
+                if(board.AttackedSquare(board.wking_square, false))
+                {
+                    wCheck == true;
+                }
+                break;
+            }
+            case 'k':
+            {
+                if(board.AttackedSquare(board.bking_square, true))
+                {
+                    bCheck == true;
+                }
+                break;
             }
         }
     }
+}
 
 // prefer big center
     if(board.squares[28]=='P' && board.squares[29]=='P')
@@ -82,16 +99,21 @@ double evaluate(thc::ChessRules board)
         evaluation -= 0.5;
     }
 
-// check for mate 
-    if (legalMoves.size() == 0 && board.white)
-    {
-        evaluation -= 1000000;
-    }
 
-    else if (legalMoves.size() == 0 && !board.white)
-    {
-        evaluation += 1000000;
-    }
+
+        if(thc::TERMINAL_BCHECKMATE) //checkmate
+        {
+            evaluation -= 1000000;
+        }
+
+        if(thc::TERMINAL_BCHECKMATE) //checkmate
+        {
+            evaluation += 1000000;
+        }
+        if(thc::TERMINAL_BSTALEMATE || thc::TERMINAL_WSTALEMATE) // stalemate
+        {
+            evaluation =0;
+        }
 
     return evaluation;
 }
