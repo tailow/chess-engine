@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(seggz VERSION 0.1.0)
 
-add_compile_options(-O)
+add_compile_options(-Ofast)
 
 add_executable(seggz ./src/main.cpp
                      ./src/uci.cpp

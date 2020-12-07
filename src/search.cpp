@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int depth = 6;
+int depth = 1;
 
 double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
 {
