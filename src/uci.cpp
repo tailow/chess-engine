@@ -6,6 +6,10 @@
 
 using namespace std;
 
+int moveNumber;
+
+thc::ChessRules board;
+
 vector<string> split(const string &str, const string &delim)
 {
     vector<string> tokens;
@@ -24,10 +28,17 @@ vector<string> split(const string &str, const string &delim)
     return tokens;
 }
 
+void go()
+{
+    moveNumber++;
+
+    string bestMove = "bestmove " + search(board).TerseOut() + "\n";
+
+    cout << bestMove << endl;
+}
+
 void loop()
 {
-    thc::ChessRules board;
-
     while (true)
     {
         string input;
@@ -52,9 +63,7 @@ void loop()
 
         else if (split(input, " ").at(0) == "go")
         {
-            string bestMove = "bestmove " + search(board).TerseOut() + "\n";
-
-            printf(bestMove.c_str());
+            go();
         }
 
         else if (split(input, " ").at(0) == "position")

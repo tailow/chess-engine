@@ -118,7 +118,7 @@ thc::Move search(thc::ChessRules board)
         }
     }
 
-    cout << "info score cp " << (int)bestEvaluation * 100 << " depth " << depth - 1 << endl;
+    cout << "info depth " << depth - 1 << " score cp " << (int)bestEvaluation * 100 << endl;
 
     return bestMove;
 }
