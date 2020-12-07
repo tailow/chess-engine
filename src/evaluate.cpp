@@ -66,43 +66,46 @@ double evaluate(thc::ChessRules board)
                 evaluation -= 9;
                 break;
             }
+            }
         }
     }
-}
 
-// prefer big center (does not really work either)
-    if(board.squares[28]=='P' && board.squares[29]=='P')
+    // prefer big center (does not really work either)
+    if (board.squares[28] == 'P' && board.squares[29] == 'P')
     {
-        evaluation +=0.5;
+        evaluation += 0.5;
     }
 
-    if(board.squares[36]=='p' && board.squares[37]=='p')
+    if (board.squares[36] == 'p' && board.squares[37] == 'p')
     {
         evaluation -= 0.5;
     }
 
-// try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
-    if(board.wking_square == board.squares[7] || board.wking_square == board.squares[3] )
+    // try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
+    if (board.squares[58] == 'K' || board.squares[62] == 'K')
     {
         evaluation += 1;
     }
-    if(board.bking_square == board.squares[59] || board.bking_square == board.squares[63])
+
+    // arrays start at 0 dummy, also starts at a8, also square is not piece dummy
+    if (board.squares[2] == 'k' || board.squares[6] == 'k')
     {
         evaluation -= 1;
     }
-//checkmate
-    if(board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false) && legalMoves.size()==0)
+
+    //checkmate
+    if (board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false) && legalMoves.size() == 0)
     {
-        evaluation -= 10000;
-    }
- 
-    if(!board.WhiteToPlay() && board.AttackedSquare(board.bking_square, true) && legalMoves.size()==0)
-    {
-        evaluation += 10000;
+        evaluation -= 696969;
     }
 
-//stalemate
-    if(legalMoves.size()==0 && !(board.AttackedSquare(board.wking_square, false) || board.AttackedSquare(board.bking_square, true)) )
+    else if (!board.WhiteToPlay() && board.AttackedSquare(board.bking_square, true) && legalMoves.size() == 0)
+    {
+        evaluation += 696969;
+    }
+
+    //stalemate
+    else if (legalMoves.size() == 0)
     {
         evaluation = 0;
     }

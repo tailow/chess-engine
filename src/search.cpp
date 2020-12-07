@@ -28,14 +28,7 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            double eval = alphabeta(child, depth - 1, alpha, beta, false);
-
-            value = max(value, eval);
-
-            if (eval >= value)
-            {
-                maxMove = legalMoves.at(i);
-            }
+            value = max(value, alphabeta(child, depth - 1, alpha, beta, false));
 
             alpha = max(alpha, value);
 
@@ -58,14 +51,7 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            double eval = alphabeta(child, depth - 1, alpha, beta, true);
-
-            value = min(value, eval);
-
-            if (eval <= value)
-            {
-                minMove = legalMoves.at(i);
-            }
+            value = min(value, alphabeta(child, depth - 1, alpha, beta, true));
 
             beta = min(beta, value);
 
@@ -99,15 +85,9 @@ thc::Move search(thc::ChessRules board)
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            evaluation = alphabeta(child, depth, INT_MIN, INT_MAX, false);
+            evaluation = alphabeta(child, depth - 1, INT_MIN, INT_MAX, false);
 
             if (evaluation > bestEvaluation)
-            {
-                bestMove = legalMoves.at(i);
-                bestEvaluation = evaluation;
-            }
-
-            else if (evaluation == bestEvaluation && (rand() % 100) < 25)
             {
                 bestMove = legalMoves.at(i);
                 bestEvaluation = evaluation;
@@ -126,15 +106,9 @@ thc::Move search(thc::ChessRules board)
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            evaluation = alphabeta(child, depth, INT_MIN, INT_MAX, true);
+            evaluation = alphabeta(child, depth - 1, INT_MIN, INT_MAX, true);
 
             if (evaluation < bestEvaluation)
-            {
-                bestMove = legalMoves.at(i);
-                bestEvaluation = evaluation;
-            }
-
-            else if (evaluation == bestEvaluation && (rand() % 100) < 25)
             {
                 bestMove = legalMoves.at(i);
                 bestEvaluation = evaluation;
@@ -143,6 +117,8 @@ thc::Move search(thc::ChessRules board)
             cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
         }
     }
+
+    cout << "info score cp " << (int)bestEvaluation * 100 << " depth " << depth - 1 << endl;
 
     return bestMove;
 }
