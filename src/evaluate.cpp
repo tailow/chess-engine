@@ -71,6 +71,18 @@ double evaluate(thc::ChessRules board)
         }
     }
 
+// prefer big center
+    if(board.squares[28]=='P' && board.squares[29]=='P')
+    {
+        evaluation +=0.5;
+    }
+
+    if(board.squares[36]=='p' && board.squares[37]=='p')
+    {
+        evaluation -= 0.5;
+    }
+
+// check for mate 
     if (legalMoves.size() == 0 && board.white)
     {
         evaluation -= 1000000;
