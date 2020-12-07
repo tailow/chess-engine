@@ -6,8 +6,6 @@
 
 using namespace std;
 
-int moveNumber;
-
 thc::ChessRules board;
 
 vector<string> split(const string &str, const string &delim)
@@ -30,8 +28,6 @@ vector<string> split(const string &str, const string &delim)
 
 void go()
 {
-    moveNumber++;
-
     string bestMove = "bestmove " + search(board).TerseOut() + "\n";
 
     cout << bestMove << endl;
@@ -79,7 +75,7 @@ void loop()
             {
                 if (strings.at(2) == "moves")
                 {
-                    for (int i = 3; i < strings.size(); i++)
+                    for (unsigned int i = 3; i < strings.size(); i++)
                     {
                         thc::Move move;
                         move.TerseIn(&board, strings.at(i).c_str());
@@ -92,7 +88,7 @@ void loop()
                 {
                     string fen;
 
-                    for (int i = 1; i < strings.size(); i++)
+                    for (unsigned int i = 1; i < strings.size(); i++)
                     {
                         fen += strings.at(i) + " ";
                     }

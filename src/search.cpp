@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int depth = 4;
+int depth = 6;
 
 double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
 {
@@ -20,10 +20,9 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
 
     if (maximizing)
     {
-        double value = INT_MIN;
-        thc::Move maxMove;
+        double value = -1000000;
 
-        for (int i = 0; i < legalMoves.size(); i++)
+        for (unsigned int i = 0; i < legalMoves.size(); i++)
         {
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
@@ -43,10 +42,9 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
 
     else
     {
-        double value = INT_MAX;
-        thc::Move minMove;
+        double value = 1000000;
 
-        for (int i = 0; i < legalMoves.size(); i++)
+        for (unsigned int i = 0; i < legalMoves.size(); i++)
         {
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
@@ -78,14 +76,14 @@ thc::Move search(thc::ChessRules board)
 
     if (board.white)
     {
-        bestEvaluation = INT_MIN;
+        bestEvaluation = -1000000;
 
-        for (int i = 0; i < legalMoves.size(); i++)
+        for (unsigned int i = 0; i < legalMoves.size(); i++)
         {
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            evaluation = alphabeta(child, depth - 1, INT_MIN, INT_MAX, false);
+            evaluation = alphabeta(child, depth - 1, -1000000, 1000000, false);
 
             if (evaluation > bestEvaluation)
             {
@@ -99,14 +97,14 @@ thc::Move search(thc::ChessRules board)
 
     else if (!board.white)
     {
-        bestEvaluation = INT_MAX;
+        bestEvaluation = 1000000;
 
-        for (int i = 0; i < legalMoves.size(); i++)
+        for (unsigned int i = 0; i < legalMoves.size(); i++)
         {
             thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
-            evaluation = alphabeta(child, depth - 1, INT_MIN, INT_MAX, true);
+            evaluation = alphabeta(child, depth - 1, -1000000, 1000000, true);
 
             if (evaluation < bestEvaluation)
             {
@@ -118,7 +116,7 @@ thc::Move search(thc::ChessRules board)
         }
     }
 
-    cout << "info depth " << depth - 1 << " score cp " << (int)bestEvaluation * 100 << endl;
+    cout << "info depth " << depth << " score cp " << (int)bestEvaluation * 100 << endl;
 
     return bestMove;
 }

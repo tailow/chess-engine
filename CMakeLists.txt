@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(seggz VERSION 0.1.0)
 
+add_compile_options(-O)
+
 add_executable(seggz ./src/main.cpp
                      ./src/uci.cpp
                      ./src/uci.h
@@ -14,5 +16,4 @@ add_library(thc
 
 target_link_libraries(seggz thc)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++2a")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
