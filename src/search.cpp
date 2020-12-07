@@ -2,6 +2,9 @@
 #include <string>
 #include <iostream>
 #include "evaluate.h"
+#include <thread>
+#include <chrono>
+#include <future>
 
 using namespace std;
 

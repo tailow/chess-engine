@@ -4,6 +4,8 @@
 #include "search.h"
 #include "evaluate.h"
 #include <thread>
+#include <chrono>
+#include <future>
 
 using namespace std;
 
@@ -32,9 +34,47 @@ vector<string> split(const string &str, const string &delim)
 
 void go()
 {
-    thread t(search(board, maxDepth, maxTime));
+    search(board, maxDepth, maxTime);
+}
 
-    t.join();
+void stop()
+{
+}
+
+void position(string input)
+{
+    vector<string> strings = split(input, " ");
+
+    if (strings.at(1) == "startpos")
+    {
+        board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    }
+
+    if (strings.size() > 3)
+    {
+        if (strings.at(2) == "moves")
+        {
+            for (unsigned int i = 3; i < strings.size(); i++)
+            {
+                thc::Move move;
+                move.TerseIn(&board, strings.at(i).c_str());
+
+                board.PlayMove(move);
+            }
+        }
+
+        else
+        {
+            string fen;
+
+            for (unsigned int i = 1; i < strings.size(); i++)
+            {
+                fen += strings.at(i) + " ";
+            }
+
+            board.Forsyth(fen.c_str());
+        }
+    }
 }
 
 void loop()
@@ -66,40 +106,14 @@ void loop()
             go();
         }
 
+        else if (input == "stop")
+        {
+            stop();
+        }
+
         else if (split(input, " ").at(0) == "position")
         {
-            vector<string> strings = split(input, " ");
-
-            if (strings.at(1) == "startpos")
-            {
-                board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-            }
-
-            if (strings.size() > 3)
-            {
-                if (strings.at(2) == "moves")
-                {
-                    for (unsigned int i = 3; i < strings.size(); i++)
-                    {
-                        thc::Move move;
-                        move.TerseIn(&board, strings.at(i).c_str());
-
-                        board.PlayMove(move);
-                    }
-                }
-
-                else
-                {
-                    string fen;
-
-                    for (unsigned int i = 1; i < strings.size(); i++)
-                    {
-                        fen += strings.at(i) + " ";
-                    }
-
-                    board.Forsyth(fen.c_str());
-                }
-            }
+            position(input);
         }
     }
 }
