@@ -19,31 +19,61 @@ double evaluate(thc::ChessRules board)
             case 'P':
             {
                 evaluation += 1;
+                if(i==4 && j==4)
+                {
+                    evaluation += 0.25;
+                }
+
                 break;
             }
             case 'p':
             {
                 evaluation -= 1;
+                if(i==4 && j==3)
+                {
+                    evaluation -= 0.25;
+                }
                 break;
             }
             case 'N':
             {
                 evaluation += 3;
+
+                if(i==7)
+                {
+                    evaluation -=0.33;
+                }
+                if(j==0 || j==7)
+                {
+                    evaluation -=0.5;
+                }
                 break;
             }
             case 'n':
             {
                 evaluation -= 3;
+                if(i==0)
+                {
+                    evaluation += 0.33;
+                }
                 break;
             }
             case 'B':
             {
                 evaluation += 3.5;
+                if(i==7)
+                {
+                    evaluation -=0.1;
+                }
                 break;
             }
             case 'b':
             {
                 evaluation -= 3.5;
+                if(i==0)
+                {
+                    evaluation +=0.1;
+                }
                 break;
             }
             case 'R':
@@ -69,7 +99,7 @@ double evaluate(thc::ChessRules board)
             }
         }
     }
-
+    
     // prefer big center (does not really work either)
     if (board.squares[28] == 'P' && board.squares[29] == 'P')
     {
