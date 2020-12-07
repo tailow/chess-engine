@@ -8,8 +8,6 @@ double evaluate(thc::ChessRules board)
     double evaluation;
 
     vector<thc::Move> legalMoves;
-    bool wCheck;
-    bool bCheck;
 
     board.GenLegalMoveList(legalMoves);
     for (int i = 0; i < 8; i++)
@@ -68,22 +66,6 @@ double evaluate(thc::ChessRules board)
                 evaluation -= 9;
                 break;
             }
-            case 'K':
-            {
-                if(board.AttackedSquare(board.wking_square, false))
-                {
-                    wCheck == true;
-                }
-                break;
-            }
-            case 'k':
-            {
-                if(board.AttackedSquare(board.bking_square, true))
-                {
-                    bCheck == true;
-                }
-                break;
-            }
         }
     }
 }
@@ -100,20 +82,22 @@ double evaluate(thc::ChessRules board)
     }
 
 
+//checkmate
+    if(board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false) && legalMoves.size()==0)
+    {
+        evaluation -= 10000;
+    }
+ 
+    if(!board.WhiteToPlay() && board.AttackedSquare(board.bking_square, true) && legalMoves.size()==0)
+    {
+        evaluation += 10000;
+    }
 
-        if(thc::TERMINAL_BCHECKMATE) //checkmate
-        {
-            evaluation -= 1000000;
-        }
-
-        if(thc::TERMINAL_BCHECKMATE) //checkmate
-        {
-            evaluation += 1000000;
-        }
-        if(thc::TERMINAL_BSTALEMATE || thc::TERMINAL_WSTALEMATE) // stalemate
-        {
-            evaluation =0;
-        }
+//stalemate
+    if(legalMoves.size()==0 && !(board.AttackedSquare(board.wking_square, false) || board.AttackedSquare(board.bking_square, true)) )
+    {
+        evaluation = 0;
+    }
 
     return evaluation;
 }
