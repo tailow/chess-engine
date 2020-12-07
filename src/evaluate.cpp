@@ -19,31 +19,61 @@ double evaluate(thc::ChessRules board)
             case 'P':
             {
                 evaluation += 1;
+                if(i==4 && j==4)
+                {
+                    evaluation += 0.25;
+                }
+
                 break;
             }
             case 'p':
             {
                 evaluation -= 1;
+                if(i==4 && j==3)
+                {
+                    evaluation -= 0.25;
+                }
                 break;
             }
             case 'N':
             {
                 evaluation += 3;
+
+                if(i==7)
+                {
+                    evaluation -=0.33;
+                }
+                if(j==0 || j==7)
+                {
+                    evaluation -=0.5;
+                }
                 break;
             }
             case 'n':
             {
                 evaluation -= 3;
+                if(i==0)
+                {
+                    evaluation += 0.33;
+                }
                 break;
             }
             case 'B':
             {
                 evaluation += 3.5;
+                if(i==7)
+                {
+                    evaluation -=0.1;
+                }
                 break;
             }
             case 'b':
             {
                 evaluation -= 3.5;
+                if(i==0)
+                {
+                    evaluation +=0.1;
+                }
                 break;
             }
             case 'R':
@@ -69,18 +99,7 @@ double evaluate(thc::ChessRules board)
             }
         }
     }
-
-    // prefer big center (does not really work either)
-    if (board.squares[28] == 'P' && board.squares[29] == 'P')
-    {
-        evaluation += 0.5;
-    }
-
-    if (board.squares[36] == 'p' && board.squares[37] == 'p')
-    {
-        evaluation -= 0.5;
-    }
-
+    
     // try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
     if (board.squares[58] == 'K' || board.squares[62] == 'K')
     {
