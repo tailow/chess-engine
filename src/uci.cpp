@@ -3,10 +3,14 @@
 #include "../lib/thc/thc.h"
 #include "search.h"
 #include "evaluate.h"
+#include <thread>
 
 using namespace std;
 
 thc::ChessRules board;
+
+int maxDepth = 5;
+double maxTime = 5;
 
 vector<string> split(const string &str, const string &delim)
 {
@@ -28,9 +32,9 @@ vector<string> split(const string &str, const string &delim)
 
 void go()
 {
-    string bestMove = "bestmove " + search(board).TerseOut() + "\n";
+    thread t(search(board, maxDepth, maxTime));
 
-    cout << bestMove << endl;
+    t.join();
 }
 
 void loop()

@@ -5,8 +5,6 @@
 
 using namespace std;
 
-int depth = 1;
-
 double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
 {
     vector<thc::Move> legalMoves;
@@ -63,60 +61,75 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
     }
 }
 
-thc::Move search(thc::ChessRules board)
+void search(thc::ChessRules board, int maxDepth, double maxTime)
 {
     thc::Move bestMove;
 
-    vector<thc::Move> legalMoves;
-
-    double bestEvaluation;
-    double evaluation;
-
-    board.GenLegalMoveList(legalMoves);
-
-    if (board.white)
+    for (int depth = 1; depth <= maxDepth; depth++)
     {
-        bestEvaluation = -1000000;
+        vector<thc::Move> legalMoves;
 
-        for (unsigned int i = 0; i < legalMoves.size(); i++)
+        double bestEvaluation;
+        double evaluation;
+
+        board.GenLegalMoveList(legalMoves);
+
+        if (board.white)
         {
-            thc::ChessRules child = board;
-            child.PlayMove(legalMoves.at(i));
+            bestEvaluation = -1000000;
 
-            evaluation = alphabeta(child, depth - 1, -1000000, 1000000, false);
-
-            if (evaluation > bestEvaluation)
+            for (unsigned int i = 0; i < legalMoves.size(); i++)
             {
-                bestMove = legalMoves.at(i);
-                bestEvaluation = evaluation;
-            }
+                thc::ChessRules child = board;
+                child.PlayMove(legalMoves.at(i));
 
-            cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
+                evaluation = alphabeta(child, depth - 1, -1000000, 1000000, false);
+
+                if (evaluation > bestEvaluation)
+                {
+                    bestMove = legalMoves.at(i);
+                    bestEvaluation = evaluation;
+                }
+
+                else if (evaluation == bestEvaluation && rand() % 100 > 25)
+                {
+                    bestMove = legalMoves.at(i);
+                    bestEvaluation = evaluation;
+                }
+
+                //cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
+            }
         }
+
+        else if (!board.white)
+        {
+            bestEvaluation = 1000000;
+
+            for (unsigned int i = 0; i < legalMoves.size(); i++)
+            {
+                thc::ChessRules child = board;
+                child.PlayMove(legalMoves.at(i));
+
+                evaluation = alphabeta(child, depth - 1, -1000000, 1000000, true);
+
+                if (evaluation < bestEvaluation)
+                {
+                    bestMove = legalMoves.at(i);
+                    bestEvaluation = evaluation;
+                }
+
+                else if (evaluation == bestEvaluation && rand() % 100 > 25)
+                {
+                    bestMove = legalMoves.at(i);
+                    bestEvaluation = evaluation;
+                }
+
+                //cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
+            }
+        }
+
+        cout << "info depth " << depth << " score cp " << (int)bestEvaluation * 100 << " currmove " << bestMove.TerseOut() << endl;
     }
 
-    else if (!board.white)
-    {
-        bestEvaluation = 1000000;
-
-        for (unsigned int i = 0; i < legalMoves.size(); i++)
-        {
-            thc::ChessRules child = board;
-            child.PlayMove(legalMoves.at(i));
-
-            evaluation = alphabeta(child, depth - 1, -1000000, 1000000, true);
-
-            if (evaluation < bestEvaluation)
-            {
-                bestMove = legalMoves.at(i);
-                bestEvaluation = evaluation;
-            }
-
-            cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
-        }
-    }
-
-    cout << "info depth " << depth << " score cp " << (int)bestEvaluation * 100 << endl;
-
-    return bestMove;
+    cout << "bestmove " << bestMove.TerseOut() << endl;
 }

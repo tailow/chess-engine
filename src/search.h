@@ -1,6 +1,4 @@
-#include <string>
+#pragma once
 #include "../lib/thc/thc.h"
 
-using namespace std;
-
-thc::Move search(thc::ChessRules board);
+void search(thc::ChessRules board, int maxDepth, double maxTime);
