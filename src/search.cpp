@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include "evaluate.h"
+#include <chrono>
 
 using namespace std;
 
@@ -67,6 +68,8 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
 
 thc::Move search(thc::ChessRules board)
 {
+    auto startTime = chrono::system_clock::now();
+
     thc::Move bestMove;
 
     vector<thc::Move> legalMoves;
@@ -118,7 +121,9 @@ thc::Move search(thc::ChessRules board)
         }
     }
 
-    cout << "info score cp " << (int)bestEvaluation * 100 << " depth " << depth - 1 << endl;
+    std::chrono::duration<double> difference = chrono::system_clock::now() - startTime;
+
+    cout << "info depth " << depth - 1 << " score cp " << (int)bestEvaluation * 100 << " time " << (int)(difference.count() * 1000) << endl;
 
     return bestMove;
 }
