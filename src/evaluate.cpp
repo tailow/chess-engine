@@ -70,7 +70,7 @@ double evaluate(thc::ChessRules board)
     }
 }
 
-// prefer big center
+// prefer big center (does not really work either)
     if(board.squares[28]=='P' && board.squares[29]=='P')
     {
         evaluation +=0.5;
@@ -81,7 +81,15 @@ double evaluate(thc::ChessRules board)
         evaluation -= 0.5;
     }
 
-
+// try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
+    if(board.wking_square == board.squares[7] || board.wking_square == board.squares[3] )
+    {
+        evaluation += 1;
+    }
+    if(board.bking_square == board.squares[59] || board.bking_square == board.squares[63])
+    {
+        evaluation -= 1;
+    }
 //checkmate
     if(board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false) && legalMoves.size()==0)
     {
