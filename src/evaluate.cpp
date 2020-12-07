@@ -10,18 +10,18 @@ double evaluate(thc::ChessRules board)
     vector<thc::Move> legalMoves;
 
     board.GenLegalMoveList(legalMoves);
-    for (int i = 0; i < 8; i++)
+    for (int  rank = 0; rank < 8; rank++)
     {
-        for (int j = 0; j < 8; j++)
+        for (int file = 0; file < 8; file++)
         {
-            switch (board.squares[i * 8 + j])
+            switch (board.squares[rank * 8 + file])
             {
             case 'P':
             {
                 evaluation += 1;
-                if(i==4 && j==4)
+                if(rank<5 && file==4)
                 {
-                    evaluation += 0.25;
+                    evaluation += 0.5;
                 }
 
                 break;
@@ -29,9 +29,9 @@ double evaluate(thc::ChessRules board)
             case 'p':
             {
                 evaluation -= 1;
-                if(i==4 && j==3)
+                if(rank>2 && file==4)
                 {
-                    evaluation -= 0.25;
+                    evaluation -= 0.5;
                 }
                 break;
             }
@@ -39,11 +39,11 @@ double evaluate(thc::ChessRules board)
             {
                 evaluation += 3;
 
-                if(i==7)
+                if(rank==7)
                 {
                     evaluation -=0.33;
                 }
-                if(j==0 || j==7)
+                if(file==0 || file==7)
                 {
                     evaluation -=0.5;
                 }
@@ -52,16 +52,20 @@ double evaluate(thc::ChessRules board)
             case 'n':
             {
                 evaluation -= 3;
-                if(i==0)
+                if(rank==0)
                 {
                     evaluation += 0.33;
+                }
+                if(file==0 || file==7)
+                {
+                    evaluation +=0.5;
                 }
                 break;
             }
             case 'B':
             {
                 evaluation += 3.5;
-                if(i==7)
+                if(rank==7)
                 {
                     evaluation -=0.1;
                 }
@@ -70,7 +74,7 @@ double evaluate(thc::ChessRules board)
             case 'b':
             {
                 evaluation -= 3.5;
-                if(i==0)
+                if(rank==0)
                 {
                     evaluation +=0.1;
                 }
