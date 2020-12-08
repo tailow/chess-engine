@@ -140,10 +140,10 @@ void search(thc::ChessRules board, int maxDepth, double maxTime)
                 }
             }
 
+            bestMove = currentBestMove;
+
             if (searching)
             {
-                bestMove = currentBestMove;
-
                 auto stopTime = Time::now();
 
                 chrono::duration<float> delta = stopTime - startTime;

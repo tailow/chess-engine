@@ -65,21 +65,11 @@ void go(vector<string> tokens)
         if (tokens.at(i) == "wtime" && board.white)
         {
             timeLeft = stoi(tokens.at(i + 1));
-
-            if (timeControl == 0)
-            {
-                timeControl = timeLeft;
-            }
         }
 
         else if (tokens.at(i) == "btime" && !board.white)
         {
             timeLeft = stoi(tokens.at(i + 1));
-
-            if (timeControl == 0)
-            {
-                timeControl = timeLeft;
-            }
         }
 
         else if (tokens.at(i) == "infinite")
@@ -90,9 +80,16 @@ void go(vector<string> tokens)
         }
     }
 
+    if (timeControl == 0)
+    {
+        timeControl = timeLeft;
+    }
+
     defaultMaxTime = timeControl / 30;
 
     maxTime = min(defaultMaxTime, timeLeft / 2);
+
+    cout << "max time " << maxTime << endl;
 
     if (searcher.joinable())
         searcher.join();
@@ -106,6 +103,13 @@ void go(vector<string> tokens)
     {
         timer = thread(timeMan);
     }
+}
+
+void ucinewgame()
+{
+    board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    timeControl = 0;
 }
 
 void position(vector<string> tokens)
@@ -172,7 +176,7 @@ void loop()
             position(tokens);
 
         else if (input == "ucinewgame")
-            board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            ucinewgame();
 
         else if (tokens.at(0) == "go")
             go(tokens);
