@@ -8,6 +8,9 @@ double evaluate(thc::ChessRules board)
     volatile double evaluation = 0;
 
     vector<thc::Move> legalMoves;
+    // Queens alive?
+    bool wkingSafety = true;
+    bool bkingSafety = true;
 
     board.GenLegalMoveList(legalMoves);
     for (volatile int rank = 0; rank < 8; rank++)
@@ -69,6 +72,10 @@ double evaluate(thc::ChessRules board)
                 {
                     evaluation -= 0.2;
                 }
+                if(rank==6 && (file==1 ||file == 6))
+                {
+                    evaluation += 0.122;
+                }
                 break;
             }
             case 'b':
@@ -77,6 +84,10 @@ double evaluate(thc::ChessRules board)
                 if (rank == 0)
                 {
                     evaluation += 0.2;
+                }
+                if(rank==1 && (file==1 ||file == 6))
+                {
+                    evaluation -= 0.122;
                 }
                 break;
             }
@@ -111,25 +122,27 @@ double evaluate(thc::ChessRules board)
             case 'Q':
             {
                 evaluation += 9;
+                bkingSafety = false;
                 break;
             }
             case 'q':
             {
-                evaluation -= 9;
+                evaluation -= 9;                
+                wkingSafety = false;
                 break;
             }
             }
         }
     }
-    
+
     // try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
-    if ((board.squares[58] == 'K' || board.squares[62] == 'K'))
+    if ((board.squares[58] == 'K' || board.squares[62] == 'K') && wkingSafety == false)
     {
         evaluation += 0.6;
     }
 
     // arrays start at 0 dummy, also starts at a8, also square is not piece dummy
-    if ((board.squares[2] == 'k' || board.squares[6] == 'k'))
+    if ((board.squares[2] == 'k' || board.squares[6] == 'k') && bkingSafety == false)
     {
         evaluation -= 0.6;
     }
@@ -150,6 +163,8 @@ double evaluate(thc::ChessRules board)
     {
         evaluation = 0;
     }
+
+    //cout << wkingSafety << "  <-w  b-->  " << bkingSafety;
 
     return evaluation;
 }
