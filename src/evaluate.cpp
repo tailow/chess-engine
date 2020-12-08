@@ -83,11 +83,29 @@ double evaluate(thc::ChessRules board)
             case 'R':
             {
                 evaluation += 5;
+                if(file == 0 ||file == 1 ||file ==6 || file ==7)
+                {
+                    evaluation -= 0.33;
+                }
+                if(rank == 0 || rank == 1 || rank == 6 || rank==7)
+                {
+                    evaluation +=0.44;
+                }
+
                 break;
             }
             case 'r':
             {
                 evaluation -= 5;
+                if(file == 0 ||file == 1 ||file ==6 || file ==7)
+                {
+                    evaluation +=0.33;
+                }
+                if(rank == 0 || rank == 1 || rank == 6 || rank==7)
+                {
+                    evaluation -=0.44;
+                }
+
                 break;
             }
             case 'Q':
