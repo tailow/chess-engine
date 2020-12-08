@@ -67,7 +67,7 @@ double evaluate(thc::ChessRules board)
                 evaluation += 3.5;
                 if (rank == 7)
                 {
-                    evaluation -= 0.1;
+                    evaluation -= 0.2;
                 }
                 break;
             }
@@ -76,7 +76,7 @@ double evaluate(thc::ChessRules board)
                 evaluation -= 3.5;
                 if (rank == 0)
                 {
-                    evaluation += 0.1;
+                    evaluation += 0.2;
                 }
                 break;
             }
@@ -85,11 +85,11 @@ double evaluate(thc::ChessRules board)
                 evaluation += 5;
                 if(file == 0 ||file == 1 ||file ==6 || file ==7)
                 {
-                    evaluation -= 0.33;
+                    evaluation -= 0.8;
                 }
                 if(rank == 0 || rank == 1 || rank == 6 || rank==7)
                 {
-                    evaluation +=0.44;
+                    evaluation +=0.22;
                 }
 
                 break;
@@ -99,11 +99,11 @@ double evaluate(thc::ChessRules board)
                 evaluation -= 5;
                 if(file == 0 ||file == 1 ||file ==6 || file ==7)
                 {
-                    evaluation +=0.33;
+                    evaluation +=0.8;
                 }
                 if(rank == 0 || rank == 1 || rank == 6 || rank==7)
                 {
-                    evaluation -=0.44;
+                    evaluation -=0.22;
                 }
 
                 break;
@@ -123,15 +123,15 @@ double evaluate(thc::ChessRules board)
     }
 
     // try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
-    if (board.squares[58] == 'K' || board.squares[62] == 'K')
+    if ((board.squares[58] == 'K' || board.squares[62] == 'K') && board.bqueen)
     {
-        evaluation += 1;
+        evaluation += 0.6;
     }
 
     // arrays start at 0 dummy, also starts at a8, also square is not piece dummy
-    if (board.squares[2] == 'k' || board.squares[6] == 'k')
+    if ((board.squares[2] == 'k' || board.squares[6] == 'k') && board.wqueen)
     {
-        evaluation -= 1;
+        evaluation -= 0.6;
     }
 
     //checkmate
