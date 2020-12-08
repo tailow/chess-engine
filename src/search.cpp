@@ -4,7 +4,7 @@
 #include "evaluate.h"
 #include <thread>
 #include <chrono>
-#include <future>
+#include "uci.h"
 
 using namespace std;
 
@@ -14,7 +14,7 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
 
     board.GenLegalMoveList(legalMoves);
 
-    if (depth <= 0 || legalMoves.size() == 0)
+    if (depth <= 0 || legalMoves.size() == 0 || !searching)
     {
         return evaluate(board);
     }
@@ -66,73 +66,99 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
 
 void search(thc::ChessRules board, int maxDepth, double maxTime)
 {
+    searching = true;
+
     thc::Move bestMove;
+    thc::Move currentBestMove;
 
     for (int depth = 1; depth <= maxDepth; depth++)
     {
-        vector<thc::Move> legalMoves;
-
-        double bestEvaluation;
-        double evaluation;
-
-        board.GenLegalMoveList(legalMoves);
-
-        if (board.white)
+        if (searching)
         {
-            bestEvaluation = -1000000;
+            typedef std::chrono::high_resolution_clock Time;
 
-            for (unsigned int i = 0; i < legalMoves.size(); i++)
+            auto startTime = Time::now();
+
+            vector<thc::Move> legalMoves;
+
+            double bestEvaluation;
+            double evaluation;
+
+            board.GenLegalMoveList(legalMoves);
+
+            if (board.white)
             {
-                thc::ChessRules child = board;
-                child.PlayMove(legalMoves.at(i));
+                bestEvaluation = -1000000;
 
-                evaluation = alphabeta(child, depth - 1, -1000000, 1000000, false);
-
-                if (evaluation > bestEvaluation)
+                for (unsigned int i = 0; i < legalMoves.size(); i++)
                 {
-                    bestMove = legalMoves.at(i);
-                    bestEvaluation = evaluation;
-                }
+                    thc::ChessRules child = board;
+                    child.PlayMove(legalMoves.at(i));
 
-                else if (evaluation == bestEvaluation && rand() % 100 > 25)
+                    evaluation = alphabeta(child, depth - 1, -1000000, 1000000, false);
+
+                    if (evaluation > bestEvaluation)
+                    {
+                        currentBestMove = legalMoves.at(i);
+                        bestEvaluation = evaluation;
+                    }
+
+                    else if (evaluation == bestEvaluation && rand() % 100 < 25)
+                    {
+                        currentBestMove = legalMoves.at(i);
+                        bestEvaluation = evaluation;
+                    }
+
+                    //cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
+                }
+            }
+
+            else if (!board.white)
+            {
+                bestEvaluation = 1000000;
+
+                for (unsigned int i = 0; i < legalMoves.size(); i++)
                 {
-                    bestMove = legalMoves.at(i);
-                    bestEvaluation = evaluation;
-                }
+                    thc::ChessRules child = board;
+                    child.PlayMove(legalMoves.at(i));
 
-                //cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
+                    evaluation = alphabeta(child, depth - 1, -1000000, 1000000, true);
+
+                    if (evaluation < bestEvaluation)
+                    {
+                        currentBestMove = legalMoves.at(i);
+                        bestEvaluation = evaluation;
+                    }
+
+                    else if (evaluation == bestEvaluation && rand() % 100 < 25)
+                    {
+                        currentBestMove = legalMoves.at(i);
+                        bestEvaluation = evaluation;
+                    }
+
+                    //cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
+                }
+            }
+
+            if (searching)
+            {
+                bestMove = currentBestMove;
+
+                auto stopTime = Time::now();
+
+                chrono::duration<float> delta = stopTime - startTime;
+
+                chrono::milliseconds duration = chrono::duration_cast<chrono::milliseconds>(delta);
+
+                cout << "info depth " << depth
+                     << " score cp " << (int)(bestEvaluation * 100)
+                     << " currmove " << bestMove.TerseOut()
+                     << " time " << duration.count() << endl;
             }
         }
-
-        else if (!board.white)
-        {
-            bestEvaluation = 1000000;
-
-            for (unsigned int i = 0; i < legalMoves.size(); i++)
-            {
-                thc::ChessRules child = board;
-                child.PlayMove(legalMoves.at(i));
-
-                evaluation = alphabeta(child, depth - 1, -1000000, 1000000, true);
-
-                if (evaluation < bestEvaluation)
-                {
-                    bestMove = legalMoves.at(i);
-                    bestEvaluation = evaluation;
-                }
-
-                else if (evaluation == bestEvaluation && rand() % 100 > 25)
-                {
-                    bestMove = legalMoves.at(i);
-                    bestEvaluation = evaluation;
-                }
-
-                //cout << "move " << legalMoves.at(i).NaturalOut(&board) << " evaluation: " << evaluation << endl;
-            }
-        }
-
-        cout << "info depth " << depth << " score cp " << (int)bestEvaluation * 100 << " currmove " << bestMove.TerseOut() << endl;
     }
 
     cout << "bestmove " << bestMove.TerseOut() << endl;
+
+    searching = false;
 }

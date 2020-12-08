@@ -5,7 +5,7 @@ using namespace std;
 
 double evaluate(thc::ChessRules board)
 {
-    volatile double evaluation;
+    volatile double evaluation = 0;
 
     vector<thc::Move> legalMoves;
 
