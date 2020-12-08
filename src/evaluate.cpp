@@ -72,6 +72,10 @@ double evaluate(thc::ChessRules board)
                 {
                     evaluation -= 0.2;
                 }
+                if(rank==6 && (file==1 ||file == 6))
+                {
+                    evaluation += 0.122;
+                }
                 break;
             }
             case 'b':
@@ -80,6 +84,10 @@ double evaluate(thc::ChessRules board)
                 if (rank == 0)
                 {
                     evaluation += 0.2;
+                }
+                if(rank==1 && (file==1 ||file == 6))
+                {
+                    evaluation -= 0.122;
                 }
                 break;
             }
