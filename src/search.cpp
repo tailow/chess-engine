@@ -101,6 +101,8 @@ void search(thc::ChessRules board, int maxDepth)
                     thc::ChessRules child = board;
                     child.PlayMove(legalMoves.at(i));
 
+                    nodes++;
+
                     evaluation = alphabeta(child, depth - 1, -1000000, 1000000, false);
 
                     if (evaluation > bestEvaluation)
@@ -127,6 +129,8 @@ void search(thc::ChessRules board, int maxDepth)
                 {
                     thc::ChessRules child = board;
                     child.PlayMove(legalMoves.at(i));
+
+                    nodes++;
 
                     evaluation = alphabeta(child, depth - 1, -1000000, 1000000, true);
 
@@ -165,6 +169,7 @@ void search(thc::ChessRules board, int maxDepth)
                  << " time " << duration
                  << " nodes " << nodes
                  << " nps " << nps
+                 << " string yo "
                  << endl;
         }
     }
