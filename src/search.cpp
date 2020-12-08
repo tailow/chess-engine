@@ -64,7 +64,7 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
     }
 }
 
-void search(thc::ChessRules board, int maxDepth, double maxTime)
+void search(thc::ChessRules board, int maxDepth)
 {
     searching = true;
 

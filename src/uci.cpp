@@ -7,15 +7,13 @@
 #include "../lib/thc/thc.h"
 #include "search.h"
 #include "evaluate.h"
+#include "timeman.h"
 
 using namespace std;
 
 thc::ChessRules board;
 
 int maxDepth = 10;
-
-int maxTime = 0;
-int defaultMaxTime = 2000;
 
 int timeLeft = 0;
 int timeControl = 0;
@@ -49,13 +47,6 @@ void stop()
     searching = false;
 }
 
-void timeMan()
-{
-    this_thread::sleep_for(chrono::milliseconds(maxTime));
-
-    searching = false;
-}
-
 void go(vector<string> tokens)
 {
     useTimer = true;
@@ -75,7 +66,6 @@ void go(vector<string> tokens)
         else if (tokens.at(i) == "infinite")
         {
             maxDepth = 1000000;
-            maxTime = INT_MAX;
             useTimer = false;
         }
     }
@@ -85,23 +75,17 @@ void go(vector<string> tokens)
         timeControl = timeLeft;
     }
 
-    defaultMaxTime = timeControl / 30;
-
-    maxTime = min(defaultMaxTime, timeLeft / 2);
-
-    cout << "max time " << maxTime << endl;
-
     if (searcher.joinable())
         searcher.join();
 
     if (timer.joinable())
         timer.join();
 
-    searcher = thread(search, board, maxDepth, maxTime);
+    searcher = thread(search, board, maxDepth);
 
     if (useTimer)
     {
-        timer = thread(timeMan);
+        timer = thread(timeman, timeControl, timeLeft);
     }
 }
 

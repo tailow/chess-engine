@@ -7,7 +7,9 @@ add_executable(seggz ./src/main.cpp
                      ./src/search.cpp
                      ./src/search.h
                      ./src/evaluate.cpp 
-                     ./src/evaluate.h)
+                     ./src/evaluate.h
+                     ./src/timeman.cpp
+                     ./src/timeman.h)
 add_library(thc 
             ./lib/thc/thc.cpp 
             ./lib/thc/thc.h)
