@@ -13,8 +13,6 @@ void timeman(int timeControl, int timeLeft)
 
     int maxTime = min(timeControl / 30, timeLeft / 2);
 
-    cout << "max time " << maxTime << endl;
-
     while (searching)
     {
         auto stopTime = Time::now();

@@ -13,7 +13,7 @@ using namespace std;
 
 thc::ChessRules board;
 
-int maxDepth = 10;
+int maxDepth = 20;
 
 int timeLeft = 0;
 int timeControl = 0;
