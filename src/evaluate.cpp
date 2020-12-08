@@ -122,14 +122,15 @@ double evaluate(thc::ChessRules board)
         }
     }
 
+    cout << board.bqueen;
     // try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
-    if ((board.squares[58] == 'K' || board.squares[62] == 'K') && board.bqueen)
+    if ((board.squares[58] == 'K' || board.squares[62] == 'K'))
     {
         evaluation += 0.6;
     }
 
     // arrays start at 0 dummy, also starts at a8, also square is not piece dummy
-    if ((board.squares[2] == 'k' || board.squares[6] == 'k') && board.wqueen)
+    if ((board.squares[2] == 'k' || board.squares[6] == 'k'))
     {
         evaluation -= 0.6;
     }
