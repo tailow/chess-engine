@@ -119,12 +119,12 @@ double evaluate(thc::ChessRules board)
     //checkmate
     if (board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false) && legalMoves.size() == 0)
     {
-        evaluation -= 696969;
+        evaluation -= 1000000;
     }
 
     else if (!board.WhiteToPlay() && board.AttackedSquare(board.bking_square, true) && legalMoves.size() == 0)
     {
-        evaluation += 696969;
+        evaluation += 1000000;
     }
 
     //stalemate
