@@ -18,6 +18,7 @@ int maxTime = 0;
 int defaultMaxTime = 2000;
 
 int timeLeft = 0;
+int timeControl = 0;
 
 bool searching = false;
 bool useTimer = true;
@@ -63,11 +64,21 @@ void go(vector<string> tokens)
     {
         if (tokens.at(i) == "wtime" && board.white)
         {
+            if (timeControl == 0)
+            {
+                timeControl = stoi(tokens.at(i + 1));
+            }
+
             timeLeft = stoi(tokens.at(i + 1));
         }
 
         else if (tokens.at(i) == "btime" && !board.white)
         {
+            if (timeControl == 0)
+            {
+                timeControl = stoi(tokens.at(i + 1));
+            }
+
             timeLeft = stoi(tokens.at(i + 1));
         }
 
@@ -79,9 +90,11 @@ void go(vector<string> tokens)
         }
     }
 
-    if (timeLeft != 0)
+    defaultMaxTime = timeControl / 30;
+
+    if (timeLeft < defaultMaxTime)
     {
-        maxTime = timeLeft / 6;
+        maxTime = timeLeft / 2;
     }
 
     else
