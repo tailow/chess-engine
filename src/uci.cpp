@@ -110,6 +110,7 @@ void ucinewgame()
     board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     timeControl = 0;
+    timeLeft = 0;
 }
 
 void position(vector<string> tokens)
