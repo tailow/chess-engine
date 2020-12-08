@@ -157,24 +157,23 @@ void search(thc::ChessRules board, int maxDepth)
 
             auto stopTime = Time::now();
 
-            chrono::duration<double> delta = stopTime - startTime;
+            chrono::duration<double> duration = stopTime - startTime;
 
-            auto duration = chrono::duration_cast<chrono::milliseconds>(delta).count();
+            double ms = duration.count() * 1000;
 
-            long nps = nodes;
+            long nps = (long)(nodes / ms * 1000);
 
             cout << "info depth " << depth
                  << " score cp " << (int)(bestEvaluation * 100)
                  << " currmove " << bestMove.TerseOut()
-                 << " time " << duration
+                 << " time " << (int)ms
                  << " nodes " << nodes
                  << " nps " << nps
-                 << " string yo "
-                 << endl;
+                 << "\n";
         }
     }
 
-    cout << "bestmove " << bestMove.TerseOut() << endl;
+    cout << "bestmove " << bestMove.TerseOut() << "\n";
 
     searching = false;
 }
