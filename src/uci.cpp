@@ -64,22 +64,22 @@ void go(vector<string> tokens)
     {
         if (tokens.at(i) == "wtime" && board.white)
         {
+            timeLeft = stoi(tokens.at(i + 1));
+
             if (timeControl == 0)
             {
-                timeControl = stoi(tokens.at(i + 1));
+                timeControl = timeLeft;
             }
-
-            timeLeft = stoi(tokens.at(i + 1));
         }
 
         else if (tokens.at(i) == "btime" && !board.white)
         {
+            timeLeft = stoi(tokens.at(i + 1));
+
             if (timeControl == 0)
             {
-                timeControl = stoi(tokens.at(i + 1));
+                timeControl = timeLeft;
             }
-
-            timeLeft = stoi(tokens.at(i + 1));
         }
 
         else if (tokens.at(i) == "infinite")
@@ -92,15 +92,7 @@ void go(vector<string> tokens)
 
     defaultMaxTime = timeControl / 30;
 
-    if (timeLeft < defaultMaxTime)
-    {
-        maxTime = timeLeft / 2;
-    }
-
-    else
-    {
-        maxTime = defaultMaxTime;
-    }
+    maxTime = min(defaultMaxTime, timeLeft / 2);
 
     if (searcher.joinable())
         searcher.join();
