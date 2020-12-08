@@ -8,6 +8,8 @@
 
 using namespace std;
 
+long nodes;
+
 double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, bool maximizing)
 {
     vector<thc::Move> legalMoves;
@@ -38,6 +40,8 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
             }
         }
 
+        nodes++;
+
         return value;
     }
 
@@ -59,6 +63,8 @@ double alphabeta(thc::ChessRules &board, int depth, double alpha, double beta, b
                 break;
             }
         }
+
+        nodes++;
 
         return value;
     }
@@ -143,18 +149,23 @@ void search(thc::ChessRules board, int maxDepth)
             if (searching)
             {
                 bestMove = currentBestMove;
-
-                auto stopTime = Time::now();
-
-                chrono::duration<float> delta = stopTime - startTime;
-
-                chrono::milliseconds duration = chrono::duration_cast<chrono::milliseconds>(delta);
-
-                cout << "info depth " << depth
-                     << " score cp " << (int)(bestEvaluation * 100)
-                     << " currmove " << bestMove.TerseOut()
-                     << " time " << duration.count() << endl;
             }
+
+            auto stopTime = Time::now();
+
+            chrono::duration<double> delta = stopTime - startTime;
+
+            auto duration = chrono::duration_cast<chrono::milliseconds>(delta).count();
+
+            long nps = nodes;
+
+            cout << "info depth " << depth
+                 << " score cp " << (int)(bestEvaluation * 100)
+                 << " currmove " << bestMove.TerseOut()
+                 << " time " << duration
+                 << " nodes " << nodes
+                 << " nps " << nps
+                 << endl;
         }
     }
 
