@@ -72,7 +72,7 @@ void go(vector<string> tokens)
         }
     }
 
-    if (timeControl == 0)
+    if (timeControl == 0 || timeLeft > timeControl)
     {
         timeControl = timeLeft;
     }
