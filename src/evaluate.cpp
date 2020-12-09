@@ -25,8 +25,13 @@ double evaluate(thc::ChessRules board)
 
                 if (rank < 5 && (file == 4 || file == 3 || file == 2))
                 {
-                    evaluation += 0.33;
+                    evaluation += 0.2;
                 }
+                if(rank < 6 && (board.squares[rank+1*8+file+1] == 'P' || board.squares[rank+1*8+file-1]))
+                {
+                    evaluation+=0.3;
+                }
+                
 
                 break;
             }
@@ -36,7 +41,11 @@ double evaluate(thc::ChessRules board)
 
                 if (rank > 2 && (file == 4 || file == 3 || file == 2))
                 {
-                    evaluation -= 0.33;
+                    evaluation -= 0.2;
+                }
+                if(rank > 1 && (board.squares[(rank-1)*8+file+1] == 'P' || board.squares[(rank-1)*8+file-1]))
+                {
+                    evaluation-=0.3;
                 }
 
                 break;
