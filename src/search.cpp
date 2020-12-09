@@ -35,7 +35,7 @@ struct Move
 
 Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, Move prevBest)
 {
-    if (depth <= 0)
+    if (depth <= 0 || !searching)
         return Move(color * evaluate(board));
 
     vector<thc::Move> legalMoves;
@@ -90,9 +90,7 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
          */
 
     if (!searching)
-    {
         return prevBest;
-    }
 
     return bestMove;
 }
