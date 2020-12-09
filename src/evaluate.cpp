@@ -27,7 +27,7 @@ double evaluate(thc::ChessRules board)
                 {
                     evaluation += 0.2;
                 }
-                if(rank < 6 && (board.squares[rank+1*8+file+1] == 'P' || board.squares[rank+1*8+file-1]))
+                if(rank < 6 && (board.squares[(rank+1)*8+file+1] == 'P' || board.squares[(rank+1*8)+file-1]=='P'))
                 {
                     evaluation+=0.3;
                 }
@@ -48,7 +48,7 @@ double evaluate(thc::ChessRules board)
                     evaluation -= 0.2;
                 }
                 //likes pawns being protected by other pawns maybe?
-                if(rank > 1 && (board.squares[(rank-1)*8+file+1] == 'P' || board.squares[(rank-1)*8+file-1]))
+                if(rank > 1 && (board.squares[(rank-1)*8+file+1] == 'p' || board.squares[(rank-1)*8+file-1] == 'p'))
                 {
                     evaluation-=0.3;
                 }
