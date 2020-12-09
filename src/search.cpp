@@ -4,6 +4,8 @@
 #include <thread>
 #include <chrono>
 #include <tuple>
+#include <algorithm>
+#include <iterator>
 
 #include "uci.h"
 #include "evaluate.h"
@@ -11,8 +13,7 @@
 using namespace std;
 
 static int nodes;
-
-//vector<thc::Move> bestLine(10);
+static int prunings;
 
 struct Move
 {
@@ -33,7 +34,7 @@ struct Move
     Move() {}
 };
 
-Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, Move prevBest)
+Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, int ply, vector<thc::Move> &pv, Move prevBest)
 {
     if (depth <= 0 || !searching)
         return Move(color * evaluate(board));
@@ -50,22 +51,29 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
 
     for (unsigned int i = 0; i < legalMoves.size(); i++)
     {
+        vector<thc::Move> childPV;
+
         if (mate.at(i))
         {
             move = Move(1000000, legalMoves.at(i));
+
+            childPV.push_back(move.move);
         }
 
         else if (stalemate.at(i))
         {
             move = Move(0, legalMoves.at(i));
+
+            childPV.push_back(move.move);
         }
 
         else
         {
-            thc::ChessRules child = board;
-            child.PlayMove(legalMoves.at(i));
+            board.PlayMove(legalMoves.at(i));
 
-            move = Move(-negamax(child, depth - 1, -beta, -alpha, -color, prevBest).evaluation, legalMoves.at(i));
+            move = Move(-negamax(board, depth - 1, -beta, -alpha, -color, ply + 1, childPV, prevBest).evaluation, legalMoves.at(i));
+
+            board.PopMove(legalMoves.at(i));
         }
 
         if (move.evaluation > bestMove.evaluation)
@@ -73,24 +81,29 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
             bestMove = move;
         }
 
-        alpha = max(alpha, bestMove.evaluation);
+        if (bestMove.evaluation > alpha)
+        {
+            alpha = bestMove.evaluation;
+
+            pv.clear();
+            pv.push_back(bestMove.move);
+
+            copy(childPV.begin(), childPV.end(), back_inserter(pv));
+        }
 
         if (alpha >= beta)
         {
+            prunings++;
             break;
         }
     }
 
     nodes++;
 
-    /*
-    bestLine.at(depth - 1) = bestMove.move;
-    cout << bestMove.move.NaturalOut(&board) << " "
-         << "\n";
-         */
-
     if (!searching)
+    {
         return prevBest;
+    }
 
     return bestMove;
 }
@@ -103,24 +116,23 @@ void search(thc::ChessRules board, int maxDepth)
 
     for (int depth = 1; depth <= maxDepth; depth++)
     {
+        vector<thc::Move> bestLine;
+
         if (searching)
         {
             typedef std::chrono::high_resolution_clock Time;
             auto startTime = Time::now();
 
-            /*
             bestLine.clear();
-            bestLine.resize(10);
-            */
 
             if (board.white)
             {
-                bestMove = negamax(board, depth, -1000000, 1000000, 1, bestMove);
+                bestMove = negamax(board, depth, -1000000, 1000000, 1, 0, bestLine, bestMove);
             }
 
             else
             {
-                bestMove = negamax(board, depth, -1000000, 1000000, -1, bestMove);
+                bestMove = negamax(board, depth, -1000000, 1000000, -1, 0, bestLine, bestMove);
                 bestMove.evaluation *= -1;
             }
 
@@ -137,22 +149,22 @@ void search(thc::ChessRules board, int maxDepth)
                      << " time " << (int)ms
                      << " nodes " << nodes
                      << " nps " << nps
-                     << endl;
-            }
+                     << " string prunings " << prunings
+                     << " pv ";
 
-            /*
-            for (int i = (int)bestLine.size() - 1; i >= 0; i--)
-            {
-                cout << bestLine.at(i).NaturalOut(&board) << " ";
-            }
+                for (int i = 0; i < (int)bestLine.size(); i++)
+                {
+                    cout << bestLine.at(i).TerseOut() << " ";
+                }
 
-            cout << "\n";
-            */
+                cout << endl;
+            }
         }
     }
 
     cout << "bestmove " << bestMove.move.TerseOut() << endl;
 
     nodes = 0;
+    prunings = 0;
     searching = false;
 }
