@@ -10,6 +10,8 @@ double evaluate(thc::ChessRules board)
     // Queens alive?
     bool wkingSafety = true;
     bool bkingSafety = true;
+    bool wAlive = false;
+    bool bAlive = false;
 
     for (volatile int rank = 0; rank < 8; rank++)
     {
@@ -141,6 +143,16 @@ double evaluate(thc::ChessRules board)
                 // wkingSafety = false;
                 break;
             }
+            case 'K':
+            {
+                wAlive = true;
+                break;
+            }
+            case 'k':
+            {
+                bAlive = true;
+                break;
+            }
             }
         }
     }
@@ -181,10 +193,12 @@ double evaluate(thc::ChessRules board)
     }
 
     //stalemate
-    else if (board.full_move_count)
+    /*
+    else if ()
     {
         evaluation = 0;
     }
+    */
 
     evaluation += ((rand() % 2) - 1);
 
