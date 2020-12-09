@@ -13,6 +13,11 @@ void timeman(int timeControl, int timeLeft)
 
     int maxTime = min(timeControl / 30, timeLeft / 2);
 
+    if (timeLeft == 0)
+    {
+        maxTime = 5000;
+    }
+
     while (searching)
     {
         auto stopTime = Time::now();

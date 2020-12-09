@@ -15,7 +15,7 @@ thc::ChessRules board;
 
 int maxDepth = 20;
 
-int timeLeft = 0;
+int timeLeft = 60000;
 int timeControl = 0;
 
 bool searching = false;
