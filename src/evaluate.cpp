@@ -11,6 +11,8 @@ double evaluate(thc::ChessRules board)
     // Queens alive?
     bool wkingSafety = true;
     bool bkingSafety = true;
+    bool wAlive= false;
+    bool bAlive = false;
 
     board.GenLegalMoveList(legalMoves);
     for (volatile int rank = 0; rank < 8; rank++)
@@ -143,6 +145,16 @@ double evaluate(thc::ChessRules board)
                // wkingSafety = false;
                 break;
             }
+            case 'K':
+            {
+                wAlive = true;
+                break;
+            }
+            case 'k':
+            {
+                bAlive=true;
+                break;
+            }
             }
         }
     }
@@ -160,14 +172,14 @@ double evaluate(thc::ChessRules board)
     }
 */
     //checkmate
-    if (board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false) && legalMoves.size() == 0)
-    {
-        evaluation -= 1000000;
-    }
-
-    else if (!board.WhiteToPlay() && board.AttackedSquare(board.bking_square, true) && legalMoves.size() == 0)
+    if (bAlive==false)
     {
         evaluation += 1000000;
+    }
+
+    else if (wAlive==true)
+    {
+        evaluation -= 1000000;
     }
 
     //stalemate
