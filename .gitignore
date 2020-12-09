@@ -19,6 +19,8 @@ build
 *.lo
 *.o
 *.obj
+*.ilk
+*.pdb
 
 # Precompiled Headers
 *.gch
@@ -40,7 +42,6 @@ build
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 
