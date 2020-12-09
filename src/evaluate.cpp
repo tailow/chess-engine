@@ -22,9 +22,9 @@ double evaluate(thc::ChessRules board)
             case 'P':
             {
                 evaluation += 1;
-                if (rank < 5 && file == 4)
+                if (rank < 5 && (file == 4 || file == 3 || file == 2))
                 {
-                    evaluation += 0.5;
+                    evaluation += 0.33;
                 }
 
                 break;
@@ -32,9 +32,9 @@ double evaluate(thc::ChessRules board)
             case 'p':
             {
                 evaluation -= 1;
-                if (rank > 2 && file == 4)
+                if (rank > 2 && (file == 4 || file == 3 || file == 2))
                 {
-                    evaluation -= 0.5;
+                    evaluation -= 0.33;
                 }
                 break;
             }
@@ -67,27 +67,27 @@ double evaluate(thc::ChessRules board)
             }
             case 'B':
             {
-                evaluation += 3.5;
+                evaluation += 3.2;
                 if (rank == 7)
                 {
                     evaluation -= 0.2;
                 }
                 if(rank==6 && (file==1 ||file == 6))
                 {
-                    evaluation += 0.122;
+                    evaluation += 0.35;
                 }
                 break;
             }
             case 'b':
             {
-                evaluation -= 3.5;
+                evaluation -= 3.2;
                 if (rank == 0)
                 {
                     evaluation += 0.2;
                 }
                 if(rank==1 && (file==1 ||file == 6))
                 {
-                    evaluation -= 0.122;
+                    evaluation -= 0.35;
                 }
                 break;
             }
