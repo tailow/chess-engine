@@ -134,13 +134,13 @@ double evaluate(thc::ChessRules board)
             case 'Q':
             {
                 evaluation += 9;
-                //bkingSafety = false;
+                bkingSafety = false;
                 break;
             }
             case 'q':
             {
                 evaluation -= 9;
-                // wkingSafety = false;
+                wkingSafety = false;
                 break;
             }
             case 'K':
