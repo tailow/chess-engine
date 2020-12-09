@@ -17,11 +17,11 @@ void timeman(int timeControl, int timeLeft)
     {
         auto stopTime = Time::now();
 
-        chrono::duration<float> delta = stopTime - startTime;
+        chrono::duration<float> duration = stopTime - startTime;
 
-        chrono::milliseconds duration = chrono::duration_cast<chrono::milliseconds>(delta);
+        duration *= 1000;
 
-        if (chrono::duration_cast<chrono::milliseconds>(duration).count() > maxTime)
+        if (duration.count() > maxTime)
         {
             searching = false;
         }
