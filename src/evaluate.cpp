@@ -10,8 +10,6 @@ double evaluate(thc::ChessRules board)
     // Queens alive?
     bool wkingSafety = true;
     bool bkingSafety = true;
-    bool wAlive = false;
-    bool bAlive = false;
 
     for (volatile int rank = 0; rank < 8; rank++)
     {
@@ -25,8 +23,17 @@ double evaluate(thc::ChessRules board)
 
                 if (rank < 5 && (file == 4 || file == 3 || file == 2))
                 {
-                    evaluation += 0.33;
+                    evaluation += 0.2;
                 }
+                if(rank < 6 && (board.squares[(rank+1)*8+file+1] == 'P' || board.squares[(rank+1*8)+file-1]=='P'))
+                {
+                    evaluation+=0.3;
+                }
+                if(board.squares[(rank+1)*8+file]=='P')
+                {
+                    evaluation -=0.19;
+                }
+                
 
                 break;
             }
@@ -36,7 +43,17 @@ double evaluate(thc::ChessRules board)
 
                 if (rank > 2 && (file == 4 || file == 3 || file == 2))
                 {
-                    evaluation -= 0.33;
+                    evaluation -= 0.2;
+                }
+                //likes pawns being protected by other pawns maybe?
+                if(rank > 1 && (board.squares[(rank-1)*8+file+1] == 'p' || board.squares[(rank-1)*8+file-1] == 'p'))
+                {
+                    evaluation-=0.3;
+                }
+                //doesnt like doubled pawns
+                if(board.squares[(rank-1)*8+file]=='p')
+                {
+                    evaluation +=0.19;
                 }
 
                 break;
@@ -145,12 +162,19 @@ double evaluate(thc::ChessRules board)
             }
             case 'K':
             {
-                wAlive = true;
+                //check if the king is safe when castled
+                if(((rank-1)*8 + file == 'P')&&((rank-1)*8 + file + 1 == 'P'))
+                {
+                    evaluation+=0.3;
+                }
                 break;
             }
             case 'k':
             {
-                bAlive = true;
+                if(((rank+1)*8 + file == 'p') && ((rank+1)*8 + file + 1 == 'p'))
+                {
+                    evaluation-=0.3;
+                }
                 break;
             }
             }
@@ -159,12 +183,12 @@ double evaluate(thc::ChessRules board)
 
     if ((board.squares[58] == 'K' || board.squares[62] == 'K') && wkingSafety == false)
     {
-        evaluation += 0.6;
+        evaluation += 0.5;
     }
 
     if ((board.squares[2] == 'k' || board.squares[6] == 'k') && bkingSafety == false)
     {
-        evaluation -= 0.6;
+        evaluation -= 0.5;
     }
 
     evaluation += (rand() % 1 - 0.5) / 10;
