@@ -157,51 +157,17 @@ double evaluate(thc::ChessRules board)
         }
     }
 
-    // try to castle does not work somereason test fen (r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4)
     if ((board.squares[58] == 'K' || board.squares[62] == 'K') && wkingSafety == false)
     {
         evaluation += 0.6;
     }
 
-    // arrays start at 0 dummy, also starts at a8, also square is not piece dummy
     if ((board.squares[2] == 'k' || board.squares[6] == 'k') && bkingSafety == false)
     {
         evaluation -= 0.6;
     }
 
-    //checkmate
-    /*
-    if (board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false))
-    {
-        vector<thc::Move> legalMoves;
-        board.GenLegalMoveList(legalMoves);
-
-        if (legalMoves.size() == 0)
-        {
-            evaluation -= 1000000;
-        }
-    }
-
-    else if (!board.WhiteToPlay() && board.AttackedSquare(board.bking_square, true))
-    {
-        vector<thc::Move> legalMoves;
-        board.GenLegalMoveList(legalMoves);
-
-        if (legalMoves.size() == 0)
-        {
-            evaluation += 1000000;
-        }
-    }
-
-    //stalemate
-
-    else if ()
-    {
-        evaluation = 0;
-    }
-    */
-
-    evaluation += ((rand() % 2) - 1);
+    evaluation += (rand() % 1 - 0.5) / 10;
 
     //cout << wkingSafety << "  <-w  b-->  " << bkingSafety;
 

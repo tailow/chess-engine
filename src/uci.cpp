@@ -97,6 +97,8 @@ void ucinewgame()
 
     timeControl = 0;
     timeLeft = 0;
+
+    searching = false;
 }
 
 void position(vector<string> tokens)
