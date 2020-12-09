@@ -35,13 +35,13 @@ struct Move
 
 Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color)
 {
-    vector<thc::Move> legalMoves;
-    board.GenLegalMoveList(legalMoves);
-
     Move bestMove(-1000000);
 
-    if (depth <= 0 || legalMoves.size() == 0 || !searching)
+    if (depth <= 0 || !searching)
         return Move(color * evaluate(board), bestMove.move);
+
+    vector<thc::Move> legalMoves;
+    board.GenLegalMoveList(legalMoves);
 
     for (unsigned int i = 0; i < legalMoves.size(); i++)
     {
@@ -114,7 +114,7 @@ void search(thc::ChessRules board, int maxDepth)
                  << " time " << (int)ms
                  << " nodes " << nodes
                  << " nps " << nps
-                 << "\n";
+                 << endl;
 
             /*
             for (int i = (int)bestLine.size() - 1; i >= 0; i--)
@@ -127,7 +127,7 @@ void search(thc::ChessRules board, int maxDepth)
         }
     }
 
-    cout << "bestmove " << bestMove.move.TerseOut() << "\n";
+    cout << "bestmove " << bestMove.move.TerseOut() << endl;
 
     nodes = 0;
     searching = false;
