@@ -33,22 +33,22 @@ struct Move
     Move() {}
 };
 
-Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color)
+Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, Move prevBest)
 {
-    Move bestMove(-1000000);
-
     if (depth <= 0 || !searching)
-        return Move(color * evaluate(board), bestMove.move);
+        return Move(color * evaluate(board));
 
     vector<thc::Move> legalMoves;
     board.GenLegalMoveList(legalMoves);
+
+    Move bestMove(-1000000);
 
     for (unsigned int i = 0; i < legalMoves.size(); i++)
     {
         thc::ChessRules child = board;
         child.PlayMove(legalMoves.at(i));
 
-        Move move(-negamax(child, depth - 1, -beta, -alpha, -color).evaluation, legalMoves.at(i));
+        Move move(-negamax(child, depth - 1, -beta, -alpha, -color, prevBest).evaluation, legalMoves.at(i));
 
         if (move.evaluation > bestMove.evaluation)
         {
@@ -71,7 +71,15 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
          << "\n";
          */
 
-    return bestMove;
+    if (searching)
+    {
+        return bestMove;
+    }
+
+    else
+    {
+        return prevBest;
+    }
 }
 
 void search(thc::ChessRules board, int maxDepth)
@@ -94,27 +102,30 @@ void search(thc::ChessRules board, int maxDepth)
 
             if (board.white)
             {
-                bestMove = negamax(board, depth, -1000000, 1000000, 1);
+                bestMove = negamax(board, depth, -1000000, 1000000, 1, bestMove);
             }
 
             else
             {
-                bestMove = negamax(board, depth, -1000000, 1000000, -1);
+                bestMove = negamax(board, depth, -1000000, 1000000, -1, bestMove);
                 bestMove.evaluation *= -1;
             }
 
-            auto stopTime = Time::now();
-            chrono::duration<double> duration = stopTime - startTime;
-            double ms = duration.count() * 1000;
-            int nps = (int)(nodes / ms * 1000);
+            if (searching)
+            {
+                auto stopTime = Time::now();
+                chrono::duration<double> duration = stopTime - startTime;
+                double ms = duration.count() * 1000;
+                int nps = (int)(nodes / ms * 1000);
 
-            cout << "info depth " << depth
-                 << " score cp " << (int)(bestMove.evaluation * 100)
-                 << " currmove " << bestMove.move.TerseOut()
-                 << " time " << (int)ms
-                 << " nodes " << nodes
-                 << " nps " << nps
-                 << endl;
+                cout << "info depth " << depth
+                     << " score cp " << (int)(bestMove.evaluation * 100)
+                     << " currmove " << bestMove.move.TerseOut()
+                     << " time " << (int)ms
+                     << " nodes " << nodes
+                     << " nps " << nps
+                     << endl;
+            }
 
             /*
             for (int i = (int)bestLine.size() - 1; i >= 0; i--)
