@@ -35,20 +35,38 @@ struct Move
 
 Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, Move prevBest)
 {
-    if (depth <= 0 || !searching)
+    if (depth <= 0)
         return Move(color * evaluate(board));
 
     vector<thc::Move> legalMoves;
-    board.GenLegalMoveList(legalMoves);
+    vector<bool> check;
+    vector<bool> mate;
+    vector<bool> stalemate;
+
+    board.GenLegalMoveList(legalMoves, check, mate, stalemate);
 
     Move bestMove(-1000000);
+    Move move;
 
     for (unsigned int i = 0; i < legalMoves.size(); i++)
     {
-        thc::ChessRules child = board;
-        child.PlayMove(legalMoves.at(i));
+        if (mate.at(i))
+        {
+            move = Move(1000000, legalMoves.at(i));
+        }
 
-        Move move(-negamax(child, depth - 1, -beta, -alpha, -color, prevBest).evaluation, legalMoves.at(i));
+        else if (stalemate.at(i))
+        {
+            move = Move(0, legalMoves.at(i));
+        }
+
+        else
+        {
+            thc::ChessRules child = board;
+            child.PlayMove(legalMoves.at(i));
+
+            move = Move(-negamax(child, depth - 1, -beta, -alpha, -color, prevBest).evaluation, legalMoves.at(i));
+        }
 
         if (move.evaluation > bestMove.evaluation)
         {
@@ -71,15 +89,12 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
          << "\n";
          */
 
-    if (searching)
-    {
-        return bestMove;
-    }
-
-    else
+    if (!searching)
     {
         return prevBest;
     }
+
+    return bestMove;
 }
 
 void search(thc::ChessRules board, int maxDepth)

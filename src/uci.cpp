@@ -13,7 +13,8 @@ using namespace std;
 
 thc::ChessRules board;
 
-int maxDepth = 20;
+int maxDepth;
+int defaultMaxDepth = 20;
 
 int timeLeft = 60000;
 int timeControl = 0;
@@ -50,6 +51,7 @@ void stop()
 void go(vector<string> tokens)
 {
     useTimer = true;
+    maxDepth = defaultMaxDepth;
 
     for (unsigned int i = 1; i < tokens.size(); i++)
     {

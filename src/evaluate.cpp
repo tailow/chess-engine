@@ -170,6 +170,7 @@ double evaluate(thc::ChessRules board)
     }
 
     //checkmate
+    /*
     if (board.WhiteToPlay() && board.AttackedSquare(board.wking_square, false))
     {
         vector<thc::Move> legalMoves;
@@ -193,7 +194,7 @@ double evaluate(thc::ChessRules board)
     }
 
     //stalemate
-    /*
+
     else if ()
     {
         evaluation = 0;
@@ -203,6 +204,13 @@ double evaluate(thc::ChessRules board)
     evaluation += ((rand() % 2) - 1);
 
     //cout << wkingSafety << "  <-w  b-->  " << bkingSafety;
+
+    thc::DRAWTYPE drawType;
+
+    if (board.IsDraw(board.white, drawType))
+    {
+        evaluation = 0;
+    }
 
     return evaluation;
 }
