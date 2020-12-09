@@ -10,8 +10,6 @@ double evaluate(thc::ChessRules board)
     // Queens alive?
     bool wkingSafety = true;
     bool bkingSafety = true;
-    bool wAlive = false;
-    bool bAlive = false;
 
     for (volatile int rank = 0; rank < 8; rank++)
     {
@@ -185,12 +183,12 @@ double evaluate(thc::ChessRules board)
 
     if ((board.squares[58] == 'K' || board.squares[62] == 'K') && wkingSafety == false)
     {
-        evaluation += 0.3;
+        evaluation += 0.5;
     }
 
     if ((board.squares[2] == 'k' || board.squares[6] == 'k') && bkingSafety == false)
     {
-        evaluation -= 0.3;
+        evaluation -= 0.5;
     }
 
     evaluation += (rand() % 1 - 0.5) / 10;
