@@ -70,6 +70,9 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
 
     for (unsigned int i = 0; i < legalMoves.size(); i++)
     {
+        if (!searching)
+            break;
+
         vector<thc::Move> childPV;
 
         if (mate.at(i))
@@ -149,7 +152,6 @@ void search(thc::ChessRules board, int maxDepth)
             else
             {
                 bestMove = negamax(board, depth, -1000000, 1000000, -1, 0, bestLine, bestMove, bestLine);
-                bestMove.evaluation *= -1;
             }
 
             if (searching)
