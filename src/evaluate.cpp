@@ -126,9 +126,14 @@ double evaluate(thc::ChessRules board)
                 {
                     evaluation -= 0.8;
                 }
-                if (rank == 0 || rank == 1 || rank == 6 || rank == 7)
+                if (!(rank == 0 || rank == 1 || rank == 6 || rank == 7))
                 {
-                    evaluation += 0.22;
+                    evaluation -= 0.22;
+                }
+                // likes rooks next to each other
+                if( !((rank*8+file+1) == 'R' || (rank*8+file+-1) == 'R'))
+                {
+                    evaluation -= 0.3;
                 }
 
                 break;
@@ -141,9 +146,14 @@ double evaluate(thc::ChessRules board)
                 {
                     evaluation += 0.8;
                 }
-                if (rank == 0 || rank == 1 || rank == 6 || rank == 7)
+                if (!(rank == 0 || rank == 1 || rank == 6 || rank == 7))
                 {
-                    evaluation -= 0.22;
+                    evaluation += 0.22;
+                }
+                // likes rooks next to each other
+                if(!((rank*8+file+1) == 'r' || (rank*8+file+-1) == 'r'))
+                {
+                    evaluation += 0.3;
                 }
 
                 break;
