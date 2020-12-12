@@ -52,9 +52,11 @@ void stop()
 
 void go(vector<string> tokens)
 {
+    if (!ponderHit)
+        searching = false;
+
     useTimer = true;
     maxDepth = defaultMaxDepth;
-    pondering = false;
 
     for (unsigned int i = 1; i < tokens.size(); i++)
     {
@@ -96,7 +98,7 @@ void go(vector<string> tokens)
     if (searcher.joinable() && !ponderHit)
         searcher.join();
 
-    if (timer.joinable() && !ponderHit)
+    if (timer.joinable())
         timer.join();
 
     // start new searcher thread if ponder move not played
@@ -114,6 +116,7 @@ void go(vector<string> tokens)
 void ponderhit()
 {
     ponderHit = true;
+    pondering = false;
 
     vector<string> tokens;
 
@@ -129,6 +132,8 @@ void ucinewgame()
     timeLeft = 0;
 
     searching = false;
+    pondering = false;
+    ponderHit = false;
 }
 
 void position(vector<string> tokens)

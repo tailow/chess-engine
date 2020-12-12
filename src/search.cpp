@@ -131,8 +131,7 @@ void search(thc::ChessRules board, int maxDepth)
 {
     searching = true;
 
-    Move currMove;
-    Move bestMove;
+    Move move;
 
     vector<Move> pv;
     vector<Move> bestPv;
@@ -144,19 +143,20 @@ void search(thc::ChessRules board, int maxDepth)
             typedef std::chrono::high_resolution_clock Time;
             auto startTime = Time::now();
 
+            bestPv = pv;
+
             if (board.white)
             {
-                currMove = negamax(board, depth, -1000000, 1000000, 1, 0, pv, pv);
+                move = negamax(board, depth, -1000000, 1000000, 1, 0, pv, pv);
             }
 
             else
             {
-                currMove = negamax(board, depth, -1000000, 1000000, -1, 0, pv, pv);
+                move = negamax(board, depth, -1000000, 1000000, -1, 0, pv, pv);
             }
 
-            if (currMove.mate != 0)
+            if (move.mate != 0)
             {
-                bestMove = currMove;
                 bestPv = pv;
 
                 auto stopTime = Time::now();
@@ -165,7 +165,7 @@ void search(thc::ChessRules board, int maxDepth)
                 int nps = (int)(nodes / ms * 1000);
 
                 cout << "info depth " << depth
-                     << " score cp mate " << ceil(((double)bestMove.mate) / 2)
+                     << " score cp mate " << ceil(((double)bestPv.at(0).mate) / 2)
                      << " time " << (int)ms
                      << " nodes " << nodes
                      << " nps " << nps
@@ -181,7 +181,6 @@ void search(thc::ChessRules board, int maxDepth)
 
             else if (searching)
             {
-                bestMove = currMove;
                 bestPv = pv;
 
                 auto stopTime = Time::now();
@@ -190,7 +189,7 @@ void search(thc::ChessRules board, int maxDepth)
                 int nps = (int)(nodes / ms * 1000);
 
                 cout << "info depth " << depth
-                     << " score cp " << (int)(currMove.evaluation * 100)
+                     << " score cp " << (int)(move.evaluation * 100)
                      << " time " << (int)ms
                      << " nodes " << nodes
                      << " nps " << nps
@@ -207,7 +206,14 @@ void search(thc::ChessRules board, int maxDepth)
     }
 
     if (!pondering)
-        cout << "bestmove " << bestMove.move.TerseOut() << " ponder " << bestPv.at(1).move.TerseOut() << endl;
+    {
+        cout << "bestmove " << bestPv.at(0).move.TerseOut();
+
+        if (bestPv.size() > 1)
+            cout << " ponder " << bestPv.at(1).move.TerseOut();
+    }
+
+    cout << endl;
 
     nodes = 0;
     searching = false;

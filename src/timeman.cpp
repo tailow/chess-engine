@@ -9,9 +9,11 @@ void timeman(int timeControl, int timeLeft)
 {
     typedef std::chrono::high_resolution_clock Time;
 
+    cout << "";
+
     auto startTime = Time::now();
 
-    volatile int maxTime = min(timeControl / 60, timeLeft / 2);
+    int maxTime = min(timeControl / 60, timeLeft / 2);
 
     if (timeLeft == 0)
     {
