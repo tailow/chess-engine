@@ -70,6 +70,12 @@ void go(vector<string> tokens)
             maxDepth = 1000000;
             useTimer = false;
         }
+
+        else if (tokens.at(i) == "depth")
+        {
+            maxDepth = stoi(tokens.at(i + 1));
+            useTimer = false;
+        }
     }
 
     if (timeControl == 0 || timeLeft > timeControl)
@@ -106,32 +112,32 @@ void position(vector<string> tokens)
     if (tokens.at(1) == "startpos")
     {
         board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+        if (tokens.size() > 3)
+        {
+            if (tokens.at(2) == "moves")
+            {
+                for (unsigned int i = 3; i < tokens.size(); i++)
+                {
+                    thc::Move move;
+                    move.TerseIn(&board, tokens.at(i).c_str());
+
+                    board.PlayMove(move);
+                }
+            }
+        }
     }
 
-    if (tokens.size() > 3)
+    else if (tokens.at(1) == "fen")
     {
-        if (tokens.at(2) == "moves")
-        {
-            for (unsigned int i = 3; i < tokens.size(); i++)
-            {
-                thc::Move move;
-                move.TerseIn(&board, tokens.at(i).c_str());
+        string fen;
 
-                board.PlayMove(move);
-            }
+        for (unsigned int i = 2; i < tokens.size(); i++)
+        {
+            fen += tokens.at(i) + " ";
         }
 
-        else
-        {
-            string fen;
-
-            for (unsigned int i = 1; i < tokens.size(); i++)
-            {
-                fen += tokens.at(i) + " ";
-            }
-
-            board.Forsyth(fen.c_str());
-        }
+        board.Forsyth(fen.c_str());
     }
 }
 

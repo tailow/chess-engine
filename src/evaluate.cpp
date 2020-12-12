@@ -3,17 +3,18 @@
 
 using namespace std;
 
-double evaluate(thc::ChessRules board)
+double evaluate(thc::ChessRules &board)
 {
-    volatile double evaluation = 0;
+    double evaluation = 0;
 
     // Queens alive?
+
     bool wkingSafety = true;
     bool bkingSafety = true;
 
-    for (volatile int rank = 0; rank < 8; rank++)
+    for (int rank = 0; rank < 8; rank++)
     {
-        for (volatile int file = 0; file < 8; file++)
+        for (int file = 0; file < 8; file++)
         {
             switch (board.squares[rank * 8 + file])
             {
@@ -25,15 +26,14 @@ double evaluate(thc::ChessRules board)
                 {
                     evaluation += 0.2;
                 }
-                if(rank < 6 && (board.squares[(rank+1)*8+file+1] == 'P' || board.squares[(rank+1*8)+file-1]=='P'))
+                if (rank < 6 && (board.squares[(rank + 1) * 8 + file + 1] == 'P' || board.squares[(rank + 1 * 8) + file - 1] == 'P'))
                 {
-                    evaluation+=0.3;
+                    evaluation += 0.3;
                 }
-                if(board.squares[(rank+1)*8+file]=='P')
+                if (board.squares[(rank + 1) * 8 + file] == 'P')
                 {
-                    evaluation -=0.19;
+                    evaluation -= 0.19;
                 }
-                
 
                 break;
             }
@@ -46,14 +46,14 @@ double evaluate(thc::ChessRules board)
                     evaluation -= 0.2;
                 }
                 //likes pawns being protected by other pawns maybe?
-                if(rank > 1 && (board.squares[(rank-1)*8+file+1] == 'p' || board.squares[(rank-1)*8+file-1] == 'p'))
+                if (rank > 1 && (board.squares[(rank - 1) * 8 + file + 1] == 'p' || board.squares[(rank - 1) * 8 + file - 1] == 'p'))
                 {
-                    evaluation-=0.3;
+                    evaluation -= 0.3;
                 }
                 //doesnt like doubled pawns
-                if(board.squares[(rank-1)*8+file]=='p')
+                if (board.squares[(rank - 1) * 8 + file] == 'p')
                 {
-                    evaluation +=0.19;
+                    evaluation += 0.19;
                 }
 
                 break;
@@ -131,7 +131,7 @@ double evaluate(thc::ChessRules board)
                     evaluation -= 0.22;
                 }
                 // likes rooks next to each other
-                if( !((rank*8+file+1) == 'R' || (rank*8+file+-1) == 'R'))
+                if (!((rank * 8 + file + 1) == 'R' || (rank * 8 + file + -1) == 'R'))
                 {
                     evaluation -= 0.3;
                 }
@@ -151,7 +151,7 @@ double evaluate(thc::ChessRules board)
                     evaluation += 0.22;
                 }
                 // likes rooks next to each other
-                if(!((rank*8+file+1) == 'r' || (rank*8+file+-1) == 'r'))
+                if (!((rank * 8 + file + 1) == 'r' || (rank * 8 + file + -1) == 'r'))
                 {
                     evaluation += 0.3;
                 }
@@ -173,17 +173,17 @@ double evaluate(thc::ChessRules board)
             case 'K':
             {
                 //check if the king is safe when castled
-                if(((rank-1)*8 + file == 'P')&&((rank-1)*8 + file + 1 == 'P'))
+                if (((rank - 1) * 8 + file == 'P') && ((rank - 1) * 8 + file + 1 == 'P'))
                 {
-                    evaluation+=0.3;
+                    evaluation += 0.3;
                 }
                 break;
             }
             case 'k':
             {
-                if(((rank+1)*8 + file == 'p') && ((rank+1)*8 + file + 1 == 'p'))
+                if (((rank + 1) * 8 + file == 'p') && ((rank + 1) * 8 + file + 1 == 'p'))
                 {
-                    evaluation-=0.3;
+                    evaluation -= 0.3;
                 }
                 break;
             }
@@ -201,16 +201,18 @@ double evaluate(thc::ChessRules board)
         evaluation -= 0.5;
     }
 
-    evaluation += (rand() % 1 - 0.5) / 10;
+    evaluation += (rand() % 2 - 1) / 100;
 
     //cout << wkingSafety << "  <-w  b-->  " << bkingSafety;
 
-    thc::DRAWTYPE drawType;
+    //thc::DRAWTYPE drawType;
 
+    /*
     if (board.IsDraw(board.white, drawType))
     {
         evaluation = 0;
     }
+    */
 
     return evaluation;
 }

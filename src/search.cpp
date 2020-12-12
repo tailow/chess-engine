@@ -18,6 +18,7 @@ struct Move
 {
     double evaluation;
     thc::Move move;
+    short int mate = 69;
 
     Move(double p_eval, thc::Move p_move)
     {
@@ -33,7 +34,7 @@ struct Move
     Move() {}
 };
 
-void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &stalemate, vector<thc::Move> &pv, int &ply)
+void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &stalemate, vector<Move> &pv, int &ply)
 {
     if (ply >= pv.size())
     {
@@ -42,7 +43,7 @@ void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &s
 
     for (int i = 0; i < moveList.size(); i++)
     {
-        if (moveList.at(i) == pv.at(ply))
+        if (moveList.at(i) == pv.at(ply).move)
         {
             swap(moveList.at(i), moveList.at(0));
             swap(mate.at(i), mate.at(0));
@@ -51,7 +52,7 @@ void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &s
     }
 }
 
-Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, int ply, vector<thc::Move> &pv, Move &prevBest, vector<thc::Move> bestPv)
+Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, int ply, vector<Move> &pv, vector<Move> &bestPv)
 {
     if (depth <= 0 || !searching)
         return Move(color * evaluate(board));
@@ -68,32 +69,29 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
     Move bestMove(-1000000);
     Move move;
 
+    vector<Move> childPV;
+
     for (unsigned int i = 0; i < legalMoves.size(); i++)
     {
         if (!searching)
             break;
 
-        vector<thc::Move> childPV;
-
         if (mate.at(i))
         {
-            move = Move(1000000, legalMoves.at(i));
-
-            childPV.push_back(move.move);
+            move = Move(1000000 - ply, legalMoves.at(i));
+            move.mate = 1;
         }
 
         else if (stalemate.at(i))
         {
             move = Move(0, legalMoves.at(i));
-
-            childPV.push_back(move.move);
         }
 
         else
         {
             board.PlayMove(legalMoves.at(i));
 
-            move = Move(-negamax(board, depth - 1, -beta, -alpha, -color, ply + 1, childPV, prevBest, bestPv).evaluation, legalMoves.at(i));
+            move = Move(-negamax(board, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv).evaluation, legalMoves.at(i));
 
             board.PopMove(legalMoves.at(i));
         }
@@ -107,8 +105,13 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
         {
             alpha = bestMove.evaluation;
 
+            if (childPV.size() > 0 && childPV.at(0).mate != 69)
+            {
+                bestMove.mate = childPV.at(0).mate + 1;
+            }
+
             pv.clear();
-            pv.push_back(bestMove.move);
+            pv.push_back(bestMove);
 
             copy(childPV.begin(), childPV.end(), back_inserter(pv));
         }
@@ -121,11 +124,6 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
 
     nodes++;
 
-    if (!searching)
-    {
-        return prevBest;
-    }
-
     return bestMove;
 }
 
@@ -133,9 +131,10 @@ void search(thc::ChessRules board, int maxDepth)
 {
     searching = true;
 
+    Move currMove;
     Move bestMove;
 
-    vector<thc::Move> bestLine;
+    vector<Move> pv;
 
     for (int depth = 1; depth <= maxDepth; depth++)
     {
@@ -146,32 +145,57 @@ void search(thc::ChessRules board, int maxDepth)
 
             if (board.white)
             {
-                bestMove = negamax(board, depth, -1000000, 1000000, 1, 0, bestLine, bestMove, bestLine);
+                currMove = negamax(board, depth, -1000000, 1000000, 1, 0, pv, pv);
             }
 
             else
             {
-                bestMove = negamax(board, depth, -1000000, 1000000, -1, 0, bestLine, bestMove, bestLine);
+                currMove = negamax(board, depth, -1000000, 1000000, -1, 0, pv, pv);
             }
 
-            if (searching)
+            if (currMove.mate != 69)
             {
+                bestMove = currMove;
+
                 auto stopTime = Time::now();
                 chrono::duration<double> duration = stopTime - startTime;
                 double ms = duration.count() * 1000;
                 int nps = (int)(nodes / ms * 1000);
 
                 cout << "info depth " << depth
-                     << " score cp " << (int)(bestMove.evaluation * 100)
-                     << " currmove " << bestMove.move.TerseOut()
+                     << " score cp mate " << ceil(((double)bestMove.mate) / 2)
                      << " time " << (int)ms
                      << " nodes " << nodes
                      << " nps " << nps
-                     << " pv ";
+                     << " string pv ";
 
-                for (int i = 0; i < (int)bestLine.size(); i++)
+                for (int i = 0; i < (int)pv.size(); i++)
                 {
-                    cout << bestLine.at(i).TerseOut() << " ";
+                    cout << pv.at(i).move.TerseOut() << " ";
+                }
+
+                cout << endl;
+            }
+
+            else if (searching)
+            {
+                bestMove = currMove;
+
+                auto stopTime = Time::now();
+                chrono::duration<double> duration = stopTime - startTime;
+                double ms = duration.count() * 1000;
+                int nps = (int)(nodes / ms * 1000);
+
+                cout << "info depth " << depth
+                     << " score cp " << (int)(currMove.evaluation * 100)
+                     << " time " << (int)ms
+                     << " nodes " << nodes
+                     << " nps " << nps
+                     << " string pv ";
+
+                for (int i = 0; i < (int)pv.size(); i++)
+                {
+                    cout << pv.at(i).move.TerseOut() << " ";
                 }
 
                 cout << endl;
