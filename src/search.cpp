@@ -160,41 +160,24 @@ void search(thc::ChessRules board, int maxDepth)
                 move = negamax(board, depth, -1000000, 1000000, -1, 0, pv, pv);
             }
 
-            if (move.mate != 0)
+            if (searching)
             {
                 bestPv = pv;
+                string score;
 
                 auto stopTime = Time::now();
                 chrono::duration<double> duration = stopTime - startTime;
                 double ms = duration.count() * 1000;
                 int nps = (int)(nodes / ms * 1000);
 
-                cout << "info depth " << depth
-                     << " score cp mate " << ceil(((double)bestPv.at(0).mate) / 2)
-                     << " time " << (int)ms
-                     << " nodes " << nodes
-                     << " nps " << nps
-                     << " string pv ";
+                if (move.mate != 0)
+                    score = "mate " + to_string((int)ceil(((double)pv.at(0).mate) / 2));
 
-                for (unsigned int i = 0; i < pv.size(); i++)
-                {
-                    cout << pv.at(i).move.TerseOut() << " ";
-                }
-
-                cout << endl;
-            }
-
-            else if (searching)
-            {
-                bestPv = pv;
-
-                auto stopTime = Time::now();
-                chrono::duration<double> duration = stopTime - startTime;
-                double ms = duration.count() * 1000;
-                int nps = (int)(nodes / ms * 1000);
+                else
+                    score = "cp " + to_string((int)(move.evaluation * 100));
 
                 cout << "info depth " << depth
-                     << " score cp " << (int)(move.evaluation * 100)
+                     << " score " << score
                      << " time " << (int)ms
                      << " nodes " << nodes
                      << " nps " << nps
@@ -210,7 +193,14 @@ void search(thc::ChessRules board, int maxDepth)
         }
     }
 
-    if (!pondering && bestPv.size() > 0)
+    using namespace chrono_literals;
+
+    while (pondering)
+    {
+        this_thread::sleep_for(0.1s);
+    }
+
+    if (bestPv.size() > 0)
     {
         cout << "bestmove " << bestPv.at(0).move.TerseOut();
 
@@ -222,5 +212,4 @@ void search(thc::ChessRules board, int maxDepth)
 
     nodes = 0;
     searching = false;
-    pondering = false;
 }

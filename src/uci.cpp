@@ -71,7 +71,7 @@ void go(vector<string> tokens)
 
         else if (tokens.at(i) == "infinite")
         {
-            maxDepth = 1000000;
+            maxDepth = 100;
             useTimer = false;
         }
 
@@ -172,10 +172,27 @@ void position(vector<string> tokens)
 
         for (unsigned int i = 2; i < tokens.size(); i++)
         {
+            if (tokens.at(i) == "moves")
+                break;
+
             fen += tokens.at(i) + " ";
         }
 
         board.Forsyth(fen.c_str());
+
+        for (unsigned int i = 2; i < tokens.size(); i++)
+        {
+            if (tokens.at(i) == "moves")
+            {
+                for (unsigned int j = i + 1; j < tokens.size(); j++)
+                {
+                    thc::Move move;
+                    move.TerseIn(&board, tokens.at(j).c_str());
+
+                    board.PlayMove(move);
+                }
+            }
+        }
     }
 }
 
