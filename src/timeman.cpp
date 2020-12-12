@@ -15,7 +15,7 @@ void timeman(int timeControl, int timeLeft)
 
     auto startTime = Time::now();
 
-    int maxTime = min(timeControl / 60, timeLeft / 2);
+    int maxTime = min(timeControl / 45, timeLeft / 2);
 
     if (timeLeft == 0)
     {
