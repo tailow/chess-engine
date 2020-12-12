@@ -57,10 +57,14 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
     if (!searching)
         return Move(0);
 
+    /*
     thc::DRAWTYPE drawType;
 
     if (board.IsDraw(board.white, drawType))
+    {
         return Move(0);
+    }
+    */
 
     if (depth <= 0)
         return Move(color * evaluate(board));
