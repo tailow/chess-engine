@@ -7,8 +7,6 @@ using namespace std;
 
 void timeman(int timeControl, int timeLeft)
 {
-    cout << "start timer thread\n";
-
     searching = true;
 
     typedef std::chrono::high_resolution_clock Time;
@@ -35,6 +33,4 @@ void timeman(int timeControl, int timeLeft)
             searching = false;
         }
     }
-
-    cout << "end timer thread\n";
 }
