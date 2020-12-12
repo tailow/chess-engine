@@ -18,7 +18,7 @@ struct Move
 {
     double evaluation;
     thc::Move move;
-    short int mate = 69;
+    short int mate = 0;
 
     Move(double p_eval, thc::Move p_move)
     {
@@ -79,7 +79,7 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
         if (mate.at(i))
         {
             move = Move(1000000 - ply, legalMoves.at(i));
-            move.mate = 1;
+            move.mate = color;
         }
 
         else if (stalemate.at(i))
@@ -105,9 +105,9 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
         {
             alpha = bestMove.evaluation;
 
-            if (childPV.size() > 0 && childPV.at(0).mate != 69)
+            if (childPV.size() > 0 && childPV.at(0).mate != 0)
             {
-                bestMove.mate = childPV.at(0).mate + 1;
+                bestMove.mate = -childPV.at(0).mate + color;
             }
 
             pv.clear();
@@ -153,7 +153,7 @@ void search(thc::ChessRules board, int maxDepth)
                 currMove = negamax(board, depth, -1000000, 1000000, -1, 0, pv, pv);
             }
 
-            if (currMove.mate != 69)
+            if (currMove.mate != 0)
             {
                 bestMove = currMove;
 
