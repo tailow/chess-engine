@@ -20,6 +20,8 @@ int timeLeft = 60000;
 int timeControl = 0;
 
 bool searching = false;
+bool pondering = false;
+bool ponderHit = false;
 bool useTimer = true;
 
 thread searcher;
@@ -52,6 +54,7 @@ void go(vector<string> tokens)
 {
     useTimer = true;
     maxDepth = defaultMaxDepth;
+    pondering = false;
 
     for (unsigned int i = 1; i < tokens.size(); i++)
     {
@@ -76,6 +79,13 @@ void go(vector<string> tokens)
             maxDepth = stoi(tokens.at(i + 1));
             useTimer = false;
         }
+
+        else if (tokens.at(i) == "ponder")
+        {
+            // start pondering
+            useTimer = false;
+            pondering = true;
+        }
     }
 
     if (timeControl == 0 || timeLeft > timeControl)
@@ -83,18 +93,32 @@ void go(vector<string> tokens)
         timeControl = timeLeft;
     }
 
-    if (searcher.joinable())
+    if (searcher.joinable() && !ponderHit)
         searcher.join();
 
-    if (timer.joinable())
+    if (timer.joinable() && !ponderHit)
         timer.join();
 
-    searcher = thread(search, board, maxDepth);
+    // start new searcher thread if ponder move not played
+    if (!ponderHit)
+        searcher = thread(search, board, maxDepth);
 
     if (useTimer)
     {
         timer = thread(timeman, timeControl, timeLeft);
     }
+
+    ponderHit = false;
+}
+
+void ponderhit()
+{
+    ponderHit = true;
+
+    vector<string> tokens;
+
+    // resume normal search
+    go(tokens);
 }
 
 void ucinewgame()
@@ -109,6 +133,9 @@ void ucinewgame()
 
 void position(vector<string> tokens)
 {
+    ponderHit = false;
+    searching = false;
+
     if (tokens.at(1) == "startpos")
     {
         board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -175,5 +202,8 @@ void loop()
 
         else if (tokens.at(0) == "go")
             go(tokens);
+
+        else if (tokens.at(0) == "ponderhit")
+            ponderhit();
     }
 }

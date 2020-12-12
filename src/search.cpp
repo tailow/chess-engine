@@ -135,6 +135,7 @@ void search(thc::ChessRules board, int maxDepth)
     Move bestMove;
 
     vector<Move> pv;
+    vector<Move> bestPv;
 
     for (int depth = 1; depth <= maxDepth; depth++)
     {
@@ -156,6 +157,7 @@ void search(thc::ChessRules board, int maxDepth)
             if (currMove.mate != 0)
             {
                 bestMove = currMove;
+                bestPv = pv;
 
                 auto stopTime = Time::now();
                 chrono::duration<double> duration = stopTime - startTime;
@@ -180,6 +182,7 @@ void search(thc::ChessRules board, int maxDepth)
             else if (searching)
             {
                 bestMove = currMove;
+                bestPv = pv;
 
                 auto stopTime = Time::now();
                 chrono::duration<double> duration = stopTime - startTime;
@@ -203,8 +206,10 @@ void search(thc::ChessRules board, int maxDepth)
         }
     }
 
-    cout << "bestmove " << bestMove.move.TerseOut() << endl;
+    if (!pondering)
+        cout << "bestmove " << bestMove.move.TerseOut() << " ponder " << bestPv.at(1).move.TerseOut() << endl;
 
     nodes = 0;
     searching = false;
+    pondering = false;
 }
