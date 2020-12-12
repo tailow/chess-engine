@@ -48,13 +48,12 @@ vector<string> split(const string &str, const string &delim)
 void stop()
 {
     searching = false;
+    pondering = false;
+    ponderHit = false;
 }
 
 void go(vector<string> tokens)
 {
-    if (!ponderHit)
-        searching = false;
-
     useTimer = true;
     maxDepth = defaultMaxDepth;
 
@@ -134,12 +133,19 @@ void ucinewgame()
     searching = false;
     pondering = false;
     ponderHit = false;
+
+    if (searcher.joinable())
+        searcher.join();
+
+    if (timer.joinable())
+        timer.join();
 }
 
 void position(vector<string> tokens)
 {
     ponderHit = false;
     searching = false;
+    pondering = false;
 
     if (tokens.at(1) == "startpos")
     {

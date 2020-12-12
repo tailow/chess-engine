@@ -205,14 +205,12 @@ double evaluate(thc::ChessRules &board)
 
     //cout << wkingSafety << "  <-w  b-->  " << bkingSafety;
 
-    //thc::DRAWTYPE drawType;
+    thc::DRAWTYPE drawType;
 
-    /*
     if (board.IsDraw(board.white, drawType))
     {
         evaluation = 0;
     }
-    */
 
     return evaluation;
 }

@@ -211,9 +211,9 @@ void search(thc::ChessRules board, int maxDepth)
 
         if (bestPv.size() > 1)
             cout << " ponder " << bestPv.at(1).move.TerseOut();
-    }
 
-    cout << endl;
+        cout << endl;
+    }
 
     nodes = 0;
     searching = false;
