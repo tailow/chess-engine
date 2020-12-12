@@ -22,9 +22,9 @@ double evaluate(thc::ChessRules &board)
             {
                 evaluation += 1;
 
-                if (rank < 5 && (file == 4 || file == 3 || file == 2))
+                if (rank < 5 && (file == 4 || file == 3))
                 {
-                    evaluation += 0.2;
+                    evaluation += 0.4;
                 }
                 if (rank < 6 && (board.squares[(rank + 1) * 8 + file + 1] == 'P' || board.squares[(rank + 1 * 8) + file - 1] == 'P'))
                 {
@@ -41,9 +41,9 @@ double evaluate(thc::ChessRules &board)
             {
                 evaluation -= 1;
 
-                if (rank > 2 && (file == 4 || file == 3 || file == 2))
+                if (rank > 2 && (file == 4 || file == 3))
                 {
-                    evaluation -= 0.2;
+                    evaluation -= 0.4;
                 }
                 //likes pawns being protected by other pawns maybe?
                 if (rank > 1 && (board.squares[(rank - 1) * 8 + file + 1] == 'p' || board.squares[(rank - 1) * 8 + file - 1] == 'p'))
@@ -202,15 +202,6 @@ double evaluate(thc::ChessRules &board)
     }
 
     evaluation += (rand() % 2 - 1) / 100;
-
-    //cout << wkingSafety << "  <-w  b-->  " << bkingSafety;
-
-    thc::DRAWTYPE drawType;
-
-    if (board.IsDraw(board.white, drawType))
-    {
-        evaluation = 0;
-    }
 
     return evaluation;
 }

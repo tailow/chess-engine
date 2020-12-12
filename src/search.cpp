@@ -54,7 +54,15 @@ void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &s
 
 Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, int ply, vector<Move> &pv, vector<Move> &bestPv)
 {
-    if (depth <= 0 || !searching)
+    if (!searching)
+        return Move(0);
+
+    thc::DRAWTYPE drawType;
+
+    if (board.IsDraw(board.white, drawType))
+        return Move(0);
+
+    if (depth <= 0)
         return Move(color * evaluate(board));
 
     vector<thc::Move> legalMoves;
@@ -73,9 +81,6 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
 
     for (unsigned int i = 0; i < legalMoves.size(); i++)
     {
-        if (!searching)
-            break;
-
         if (mate.at(i))
         {
             move = Move(1000000 - ply, legalMoves.at(i));
@@ -89,7 +94,7 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
 
         else
         {
-            board.PlayMove(legalMoves.at(i));
+            board.PushMove(legalMoves.at(i));
 
             move = Move(-negamax(board, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv).evaluation, legalMoves.at(i));
 
@@ -171,7 +176,7 @@ void search(thc::ChessRules board, int maxDepth)
                      << " nps " << nps
                      << " string pv ";
 
-                for (int i = 0; i < (int)pv.size(); i++)
+                for (unsigned int i = 0; i < pv.size(); i++)
                 {
                     cout << pv.at(i).move.TerseOut() << " ";
                 }
@@ -195,7 +200,7 @@ void search(thc::ChessRules board, int maxDepth)
                      << " nps " << nps
                      << " string pv ";
 
-                for (int i = 0; i < (int)pv.size(); i++)
+                for (unsigned int i = 0; i < pv.size(); i++)
                 {
                     cout << pv.at(i).move.TerseOut() << " ";
                 }
@@ -205,7 +210,7 @@ void search(thc::ChessRules board, int maxDepth)
         }
     }
 
-    if (!pondering)
+    if (!pondering && bestPv.size() > 0)
     {
         cout << "bestmove " << bestPv.at(0).move.TerseOut();
 
