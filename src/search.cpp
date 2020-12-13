@@ -57,14 +57,10 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
     if (!searching)
         return Move(0);
 
-    /*
     thc::DRAWTYPE drawType;
 
     if (board.IsDraw(board.white, drawType))
-    {
         return Move(0);
-    }
-    */
 
     if (depth <= 0)
         return Move(color * evaluate(board));
@@ -80,6 +76,8 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
 
     Move bestMove(-1000000);
     Move move;
+
+    thc::ChessRules child;
 
     vector<Move> childPV;
 
@@ -98,11 +96,10 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
 
         else
         {
-            board.PushMove(legalMoves.at(i));
+            child = board;
+            child.PlayMove(legalMoves.at(i));
 
-            move = Move(-negamax(board, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv).evaluation, legalMoves.at(i));
-
-            board.PopMove(legalMoves.at(i));
+            move = Move(-negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv).evaluation, legalMoves.at(i));
         }
 
         if (move.evaluation > bestMove.evaluation)
