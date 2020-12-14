@@ -12,11 +12,6 @@
 
 using namespace std;
 
-static int nodes;
-
-// max hash size in mb
-const unsigned int MAX_HASH = 256;
-
 struct Move
 {
     float score;
@@ -39,10 +34,15 @@ struct Move
 
 struct Node
 {
-    unsigned long long int hash;
+    unsigned long long hash;
     Move move;
     short int depth;
 };
+
+int nodes;
+
+// max hash size in mb
+const unsigned int MAX_HASH = 256;
 
 const unsigned int TT_SIZE = MAX_HASH * 1000000 / sizeof(Node);
 
@@ -64,6 +64,20 @@ void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &s
             swap(stalemate.at(i), stalemate.at(0));
         }
     }
+}
+
+long long getHash(thc::ChessRules &board)
+{
+    long long hash = 0;
+
+    return hash;
+}
+
+void updateHash(long long &hash, thc::Move &move)
+{
+    cout << "original hash: " << hash << endl;
+    cout << "updating hash with move: " << move.TerseOut() << endl;
+    cout << "new hash: " << hash << endl;
 }
 
 Move negamax(thc::ChessRules &board, short int depth, double alpha, double beta, int color, int ply, vector<Move> &pv, vector<Move> &bestPv)
@@ -155,6 +169,8 @@ void search(thc::ChessRules board, short int maxDepth)
 
     vector<Move> pv;
     vector<Move> bestPv;
+
+    cout << sizeof(long int) << endl;
 
     for (int depth = 1; depth <= maxDepth; depth++)
     {
