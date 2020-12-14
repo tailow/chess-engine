@@ -203,5 +203,12 @@ float evaluate(thc::ChessRules &board)
 
     evaluation += (rand() % 2 - 1) / 100;
 
+    thc::DRAWTYPE drawType;
+
+    if (board.IsDraw(board.white, drawType))
+    {
+        evaluation = 0;
+    }
+
     return evaluation;
 }

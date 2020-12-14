@@ -6,6 +6,8 @@
 #include <tuple>
 #include <algorithm>
 #include <iterator>
+#include <cstdint>
+#include <array>
 
 #include "uci.h"
 #include "evaluate.h"
@@ -16,7 +18,7 @@ struct Move
 {
     float score;
     thc::Move move;
-    short int mate = 0;
+    int8_t mate = 0;
 
     Move(float p_eval, thc::Move p_move)
     {
@@ -32,11 +34,20 @@ struct Move
     Move() {}
 };
 
+enum Type
+{
+    EXACT,
+    UPPER_BOUND,
+    LOWER_BOUND
+};
+
 struct Node
 {
-    unsigned long long hash;
-    Move move;
-    short int depth;
+    uint64_t hash;
+    thc::Move bestMove;
+    uint8_t depth;
+    float score;
+    Type type;
 };
 
 int nodes;
@@ -44,9 +55,9 @@ int nodes;
 // max hash size in mb
 const unsigned int MAX_HASH = 256;
 
-const unsigned int TT_SIZE = MAX_HASH * 1000000 / sizeof(Node);
+const size_t TT_SIZE = MAX_HASH * 1000000 / sizeof(Node);
 
-Node transpositionTable[TT_SIZE];
+array<Node, TT_SIZE> transpositionTable;
 
 void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &stalemate, vector<Move> &pv, int &ply)
 {
@@ -66,14 +77,14 @@ void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &s
     }
 }
 
-long long getHash(thc::ChessRules &board)
+uint64_t getHash(thc::ChessRules &board)
 {
-    long long hash = 12345;
+    uint64_t hash = 12345;
 
     return hash;
 }
 
-void updateHash(long long &hash, thc::Move &move)
+void updateHash(uint64_t &hash, thc::Move &move)
 {
     //cout << "original hash: " << hash << endl;
     //cout << "updating hash with move: " << move.TerseOut() << endl;
@@ -86,10 +97,7 @@ Move negamax(thc::ChessRules &board, short int depth, double alpha, double beta,
     if (!searching)
         return Move(0);
 
-    thc::DRAWTYPE drawType;
-
-    if (board.IsDraw(board.white, drawType))
-        return Move(0);
+    nodes++;
 
     if (depth <= 0)
         return Move(color * evaluate(board));
@@ -105,8 +113,6 @@ Move negamax(thc::ChessRules &board, short int depth, double alpha, double beta,
 
     Move bestMove(-1000000);
     Move move;
-
-    thc::ChessRules child;
 
     vector<Move> childPV;
 
@@ -125,7 +131,7 @@ Move negamax(thc::ChessRules &board, short int depth, double alpha, double beta,
 
         else
         {
-            child = board;
+            thc::ChessRules child = board;
             child.PlayMove(legalMoves.at(i));
 
             move = Move(-negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv).score, legalMoves.at(i));
@@ -134,21 +140,21 @@ Move negamax(thc::ChessRules &board, short int depth, double alpha, double beta,
         if (move.score > bestMove.score)
         {
             bestMove = move;
-        }
 
-        if (bestMove.score > alpha)
-        {
-            alpha = bestMove.score;
-
-            if (childPV.size() > 0 && childPV.at(0).mate != 0)
+            if (bestMove.score > alpha)
             {
-                bestMove.mate = -childPV.at(0).mate + color;
+                alpha = bestMove.score;
+
+                if (childPV.size() > 0 && childPV.at(0).mate != 0)
+                {
+                    bestMove.mate = -childPV.at(0).mate + color;
+                }
+
+                pv.clear();
+                pv.push_back(bestMove);
+
+                copy(childPV.begin(), childPV.end(), back_inserter(pv));
             }
-
-            pv.clear();
-            pv.push_back(bestMove);
-
-            copy(childPV.begin(), childPV.end(), back_inserter(pv));
         }
 
         if (alpha >= beta)
@@ -156,8 +162,6 @@ Move negamax(thc::ChessRules &board, short int depth, double alpha, double beta,
             break;
         }
     }
-
-    nodes++;
 
     return bestMove;
 }
@@ -171,7 +175,7 @@ void search(thc::ChessRules board, short int maxDepth)
     vector<Move> pv;
     vector<Move> bestPv;
 
-    long long hash = getHash(board);
+    uint64_t hash = getHash(board);
 
     updateHash(hash, move.move);
 
