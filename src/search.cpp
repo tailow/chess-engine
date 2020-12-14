@@ -14,25 +14,39 @@ using namespace std;
 
 static int nodes;
 
+// max hash size in mb
+const unsigned int MAX_HASH = 256;
+
 struct Move
 {
-    double evaluation;
+    float score;
     thc::Move move;
     short int mate = 0;
 
-    Move(double p_eval, thc::Move p_move)
+    Move(float p_eval, thc::Move p_move)
     {
-        evaluation = p_eval;
+        score = p_eval;
         move = p_move;
     }
 
-    Move(double p_eval)
+    Move(float p_eval)
     {
-        evaluation = p_eval;
+        score = p_eval;
     }
 
     Move() {}
 };
+
+struct Node
+{
+    unsigned long long int hash;
+    Move move;
+    short int depth;
+};
+
+const unsigned int TT_SIZE = MAX_HASH * 1000000 / sizeof(Node);
+
+Node transpositionTable[TT_SIZE];
 
 void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &stalemate, vector<Move> &pv, int &ply)
 {
@@ -52,7 +66,7 @@ void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &s
     }
 }
 
-Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int color, int ply, vector<Move> &pv, vector<Move> &bestPv)
+Move negamax(thc::ChessRules &board, short int depth, double alpha, double beta, int color, int ply, vector<Move> &pv, vector<Move> &bestPv)
 {
     if (!searching)
         return Move(0);
@@ -85,7 +99,7 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
     {
         if (mate.at(i))
         {
-            move = Move(1000000 - ply, legalMoves.at(i));
+            move = Move(1000000.0f - ply, legalMoves.at(i));
             move.mate = color;
         }
 
@@ -99,17 +113,17 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
             child = board;
             child.PlayMove(legalMoves.at(i));
 
-            move = Move(-negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv).evaluation, legalMoves.at(i));
+            move = Move(-negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv).score, legalMoves.at(i));
         }
 
-        if (move.evaluation > bestMove.evaluation)
+        if (move.score > bestMove.score)
         {
             bestMove = move;
         }
 
-        if (bestMove.evaluation > alpha)
+        if (bestMove.score > alpha)
         {
-            alpha = bestMove.evaluation;
+            alpha = bestMove.score;
 
             if (childPV.size() > 0 && childPV.at(0).mate != 0)
             {
@@ -133,7 +147,7 @@ Move negamax(thc::ChessRules &board, int depth, double alpha, double beta, int c
     return bestMove;
 }
 
-void search(thc::ChessRules board, int maxDepth)
+void search(thc::ChessRules board, short int maxDepth)
 {
     searching = true;
 
@@ -175,7 +189,7 @@ void search(thc::ChessRules board, int maxDepth)
                     score = "mate " + to_string((int)ceil(((double)pv.at(0).mate) / 2));
 
                 else
-                    score = "cp " + to_string((int)(move.evaluation * 100));
+                    score = "cp " + to_string((int)(move.score * 100));
 
                 cout << "info depth " << depth
                      << " score " << score

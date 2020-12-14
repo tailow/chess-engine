@@ -13,8 +13,8 @@ using namespace std;
 
 thc::ChessRules board;
 
-int maxDepth;
-int defaultMaxDepth = 20;
+short int maxDepth;
+short int defaultMaxDepth = 20;
 
 int timeLeft = 60000;
 int timeControl = 0;

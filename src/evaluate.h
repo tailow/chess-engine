@@ -1,4 +1,4 @@
 #pragma once
 #include "../lib/thc/thc.h"
 
-double evaluate(thc::ChessRules &board);
+float evaluate(thc::ChessRules &board);
