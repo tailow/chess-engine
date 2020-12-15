@@ -1,8 +1,9 @@
 #include <iostream>
+
 #include "uci.h"
 #include "../lib/thc/thc.h"
 
 int main()
 {
-    loop();
+    uci::loop();
 }

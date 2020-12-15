@@ -7,7 +7,7 @@ using namespace std;
 
 void timeman(int timeControl, int timeLeft)
 {
-    searching = true;
+    uci::searching = true;
 
     typedef std::chrono::high_resolution_clock Time;
 
@@ -15,7 +15,7 @@ void timeman(int timeControl, int timeLeft)
 
     int maxTime = min(timeControl / 60, timeLeft / 2);
 
-    while (searching)
+    while (uci::searching)
     {
         auto stopTime = Time::now();
 
@@ -25,7 +25,7 @@ void timeman(int timeControl, int timeLeft)
 
         if (duration.count() > maxTime)
         {
-            searching = false;
+            uci::searching = false;
         }
     }
 }
