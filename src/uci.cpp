@@ -16,8 +16,8 @@ namespace uci
 {
     thc::ChessRules board;
 
-    short int maxDepth;
-    short int defaultMaxDepth = 20;
+    uint8_t maxDepth;
+    uint8_t defaultMaxDepth = 20;
 
     int timeLeft = 60000;
     int timeControl = 0;
@@ -28,7 +28,6 @@ namespace uci
     bool pondering = false;
     bool ponderHit = false;
     bool useTimer = true;
-    bool newGame = true;
 
     thread searcher;
     thread timer;
@@ -62,6 +61,8 @@ namespace uci
     {
         useTimer = true;
         maxDepth = defaultMaxDepth;
+
+        hash = board.Hash64Calculate();
 
         for (unsigned int i = 1; i < tokens.size(); i++)
         {
@@ -133,10 +134,6 @@ namespace uci
     {
         board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-        hash = board.Hash64Calculate();
-
-        newGame = true;
-
         timeControl = 0;
         timeLeft = 0;
 
@@ -192,13 +189,6 @@ namespace uci
 
             board.Forsyth(fen.c_str());
 
-            if (newGame)
-            {
-                hash = board.Hash64Calculate();
-
-                newGame = false;
-            }
-
             if (tokens.size() > 8)
             {
                 for (int i = 7; i < tokens.size(); i++)
@@ -221,8 +211,6 @@ namespace uci
         vector<string> tokens;
 
         board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
-        hash = board.Hash64Calculate();
 
         while (true)
         {

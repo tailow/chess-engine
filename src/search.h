@@ -3,4 +3,4 @@
 #include "../lib/thc/thc.h"
 #include <cstdint>
 
-void search(thc::ChessRules board, short int maxDepth, uint64_t hash);
+void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash);

@@ -20,6 +20,13 @@ struct Move
     thc::Move move;
     int8_t mate = 0;
 
+    Move(float p_eval, thc::Move p_move, int8_t p_mate)
+    {
+        score = p_eval;
+        move = p_move;
+        mate = p_mate;
+    }
+
     Move(float p_eval, thc::Move p_move)
     {
         score = p_eval;
@@ -44,12 +51,12 @@ enum Type
 struct Node
 {
     uint64_t hash;
-    thc::Move bestMove;
+    Move bestMove;
     uint8_t depth;
     float score;
     Type type;
 
-    Node(uint64_t p_hash, thc::Move p_bestMove, uint8_t p_depth, float p_score, Type p_type)
+    Node(uint64_t p_hash, Move p_bestMove, uint8_t p_depth, float p_score, Type p_type, int8_t p_mate)
     {
         hash = p_hash;
         bestMove = p_bestMove;
@@ -64,9 +71,6 @@ struct Node
 };
 
 int nodes;
-int transpositions;
-int ttCutoffs;
-int ttSize;
 
 // max hash size in mb
 const unsigned int MAX_HASH = 256;
@@ -84,16 +88,16 @@ void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &s
 
     for (int i = 0; i < moveList.size(); i++)
     {
-        if (moveList.at(i) == pv.at(ply).move)
+        if (moveList[i] == pv.at(ply).move)
         {
-            swap(moveList.at(i), moveList.at(0));
-            swap(mate.at(i), mate.at(0));
-            swap(stalemate.at(i), stalemate.at(0));
+            swap(moveList[i], moveList.at(0));
+            swap(mate[i], mate.at(0));
+            swap(stalemate[i], stalemate.at(0));
         }
     }
 }
 
-Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int color, int ply, vector<Move> &pv, vector<Move> &bestPv, uint64_t &hash)
+Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int color, int ply, vector<Move> &pv, uint64_t &hash)
 {
     if (!uci::searching)
         return Move(0);
@@ -104,44 +108,36 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     node.hash = hash;
     node.depth = depth;
 
+    int ttIndex = hash % TT_MAX_SIZE;
+
     double alphaOrig = alpha;
 
-    // check for transposition
-    for (int i = 0; i < ttSize; i++)
+    Node ttNode = tTable[ttIndex];
+
+    // transposition
+    if (ttNode.hash == hash)
     {
-        // transposition
-        if (tTable.at(i).hash == hash)
+        if (ttNode.depth >= depth)
         {
-            Node ttHit = tTable.at(i);
-
-            transpositions++;
-
-            if (ttHit.depth >= depth)
+            if (ttNode.type == EXACT)
             {
-                if (ttHit.type == EXACT)
-                {
-                    ttCutoffs++;
-                    return Move(ttHit.score, ttHit.bestMove);
-                }
-
-                else if (ttHit.type == LOWERBOUND)
-                {
-                    alpha = max(alpha, ttHit.score);
-                }
-
-                else if (ttHit.type == UPPERBOUND)
-                {
-                    beta = min(beta, ttHit.score);
-                }
-
-                if (alpha >= beta)
-                {
-                    ttCutoffs++;
-                    return Move(ttHit.score, ttHit.bestMove);
-                }
+                return ttNode.bestMove;
             }
 
-            break;
+            else if (ttNode.type == LOWERBOUND)
+            {
+                alpha = max(alpha, ttNode.score);
+            }
+
+            else if (ttNode.type == UPPERBOUND)
+            {
+                beta = min(beta, ttNode.score);
+            }
+
+            if (alpha >= beta)
+            {
+                return ttNode.bestMove;
+            }
         }
     }
 
@@ -155,55 +151,53 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
     board.GenLegalMoveList(legalMoves, check, mate, stalemate);
 
-    orderMoves(legalMoves, mate, stalemate, bestPv, ply);
+    orderMoves(legalMoves, mate, stalemate, pv, ply);
 
     Move bestMove(-1000000);
+    Move childBestMove;
     Move move;
 
     vector<Move> childPV;
 
     for (int i = 0; i < legalMoves.size(); i++)
     {
-        if (mate.at(i))
+        if (mate[i])
         {
-            move = Move(1000000.0f - ply, legalMoves.at(i));
+            move = Move(1000000.0f - ply, legalMoves[i]);
             move.mate = color;
         }
 
-        else if (stalemate.at(i))
+        else if (stalemate[i])
         {
-            move = Move(0, legalMoves.at(i));
+            move = Move(0, legalMoves[i]);
         }
 
         else
         {
             thc::ChessRules child = board;
-            child.PlayMove(legalMoves.at(i));
+            child.PlayMove(legalMoves[i]);
 
-            hash = board.Hash64Update(hash, legalMoves.at(i));
+            hash = board.Hash64Update(hash, legalMoves[i]);
 
-            move = Move(-negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, childPV, bestPv, hash).score, legalMoves.at(i));
+            childBestMove = negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, childPV, hash);
 
-            hash = board.Hash64Update(hash, legalMoves.at(i));
+            move = Move(-childBestMove.score, legalMoves[i]);
+
+            hash = board.Hash64Update(hash, legalMoves[i]);
         }
 
         if (move.score > bestMove.score)
         {
             bestMove = move;
 
+            if (childBestMove.mate != 0)
+            {
+                bestMove.mate = -childBestMove.mate + color;
+            }
+
             if (bestMove.score > alpha)
             {
                 alpha = bestMove.score;
-
-                if (childPV.size() > 0 && childPV.at(0).mate != 0)
-                {
-                    bestMove.mate = -childPV.at(0).mate + color;
-                }
-
-                pv.clear();
-                pv.push_back(bestMove);
-
-                copy(childPV.begin(), childPV.end(), back_inserter(pv));
             }
         }
 
@@ -213,7 +207,7 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
         }
     }
 
-    node.bestMove = bestMove.move;
+    node.bestMove = bestMove;
     node.score = bestMove.score;
 
     if (bestMove.score <= alphaOrig)
@@ -232,23 +226,39 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     }
 
     // store table entry
-    if (ttSize < TT_MAX_SIZE)
+    if (tTable[ttIndex].hash == 0 || tTable[ttIndex].depth <= depth)
     {
-        tTable.at(ttSize) = node;
-        ttSize++;
-    }
-
-    else
-    {
-        tTable.at(0) = node;
+        tTable[ttIndex] = node;
     }
 
     return bestMove;
 }
 
-void search(thc::ChessRules board, short int maxDepth, uint64_t hash)
+vector<Move> getPv(uint64_t hash, Move move, uint8_t depth, thc::ChessRules board, int8_t color)
+{
+    vector<Move> pv;
+
+    for (int i = 0; i < depth; i++)
+    {
+        Node node = tTable[hash % TT_MAX_SIZE];
+
+        if (node.bestMove.move.TerseOut() != "0000")
+        {
+            pv.push_back(node.bestMove);
+
+            hash = board.Hash64Update(hash, node.bestMove.move);
+        }
+    }
+
+    return pv;
+}
+
+void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
 {
     uci::searching = true;
+
+    typedef std::chrono::high_resolution_clock Time;
+    auto startTime = Time::now();
 
     Move move;
 
@@ -259,19 +269,18 @@ void search(thc::ChessRules board, short int maxDepth, uint64_t hash)
     {
         if (uci::searching)
         {
-            typedef std::chrono::high_resolution_clock Time;
-            auto startTime = Time::now();
-
-            bestPv = pv;
-
             if (board.white)
             {
-                move = negamax(board, depth, -1000000, 1000000, 1, 0, pv, pv, hash);
+                move = negamax(board, depth, -1000000, 1000000, 1, 0, pv, hash);
+
+                pv = getPv(hash, move, depth, board, 1);
             }
 
             else
             {
-                move = negamax(board, depth, -1000000, 1000000, -1, 0, pv, pv, hash);
+                move = negamax(board, depth, -1000000, 1000000, -1, 0, pv, hash);
+
+                pv = getPv(hash, move, depth, board, -1);
             }
 
             if (uci::searching)
@@ -324,27 +333,7 @@ void search(thc::ChessRules board, short int maxDepth, uint64_t hash)
         cout << endl;
     }
 
-    cout << "transpositions: " << transpositions << endl;
-    cout << "cutoffs: " << ttCutoffs << endl;
-
-    /*
-    for (int i = 0; i < TT_MAX_SIZE; i++)
-    {
-        if (tTable.at(i).hash != 0)
-        {
-            cout << "\nhash: " << tTable.at(i).hash
-                 << "\nbestmove: " << tTable.at(i).bestMove.TerseOut()
-                 << "\nscore: " << tTable.at(i).score
-                 << "\ndepth: " << to_string(tTable.at(i).depth);
-
-            cout << endl;
-        }
-    }
-    */
-
     nodes = 0;
-    transpositions = 0;
-    ttCutoffs = 0;
 
     uci::searching = false;
 }
