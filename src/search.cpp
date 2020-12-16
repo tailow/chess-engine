@@ -69,6 +69,7 @@ struct Node
 };
 
 int nodes;
+int transpositions;
 
 // max hash size in mb
 const unsigned int MAX_HASH = 1024;
@@ -128,19 +129,18 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
     nodes++;
 
-    Node node;
-    node.hash = hash;
-    node.depth = depth;
-
-    int ttIndex = hash % TT_MAX_SIZE;
+    if (depth <= 0)
+        return Move(color * evaluate(board));
 
     double alphaOrig = alpha;
 
-    Node ttNode = tTable[ttIndex];
+    Node ttNode = tTable[hash % TT_MAX_SIZE];
 
     // tranposition
-    if (ttNode.depth >= depth)
+    if (ttNode.hash == hash && ttNode.depth >= depth)
     {
+        transpositions++;
+
         if (ttNode.type == EXACT)
         {
             return ttNode.bestMove;
@@ -161,9 +161,6 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             return ttNode.bestMove;
         }
     }
-
-    if (depth <= 0)
-        return Move(color * evaluate(board));
 
     vector<thc::Move> legalMoves;
     vector<bool> check;
@@ -214,10 +211,7 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
                 bestMove.mate = -childBestMove.mate + color;
             }
 
-            if (bestMove.score > alpha)
-            {
-                alpha = bestMove.score;
-            }
+            alpha = max(alpha, bestMove.score);
         }
 
         if (alpha >= beta)
@@ -226,6 +220,9 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
         }
     }
 
+    Node node;
+    node.hash = hash;
+    node.depth = depth;
     node.bestMove = bestMove;
 
     if (bestMove.score <= alphaOrig)
@@ -244,9 +241,9 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     }
 
     // store table entry
-    if (tTable[ttIndex].hash == 0 || tTable[ttIndex].depth <= depth)
+    if (tTable[hash % TT_MAX_SIZE].hash == 0 || tTable[hash % TT_MAX_SIZE].depth <= depth)
     {
-        tTable[ttIndex] = node;
+        tTable[hash % TT_MAX_SIZE] = node;
     }
 
     return bestMove;
