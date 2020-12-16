@@ -138,30 +138,27 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
     Node ttNode = tTable[ttIndex];
 
-    // transposition
-    if (ttNode.hash == hash)
+    // tranposition
+    if (ttNode.depth >= depth)
     {
-        if (ttNode.depth >= depth)
+        if (ttNode.type == EXACT)
         {
-            if (ttNode.type == EXACT)
-            {
-                return ttNode.bestMove;
-            }
+            return ttNode.bestMove;
+        }
 
-            else if (ttNode.type == LOWERBOUND)
-            {
-                alpha = max(alpha, ttNode.bestMove.score);
-            }
+        else if (ttNode.type == LOWERBOUND)
+        {
+            alpha = max(alpha, ttNode.bestMove.score);
+        }
 
-            else if (ttNode.type == UPPERBOUND)
-            {
-                beta = min(beta, ttNode.bestMove.score);
-            }
+        else if (ttNode.type == UPPERBOUND)
+        {
+            beta = min(beta, ttNode.bestMove.score);
+        }
 
-            if (alpha >= beta)
-            {
-                return ttNode.bestMove;
-            }
+        if (alpha >= beta)
+        {
+            return ttNode.bestMove;
         }
     }
 
