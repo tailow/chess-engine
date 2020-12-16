@@ -53,7 +53,6 @@ struct Node
     uint64_t hash;
     Move bestMove;
     uint8_t depth;
-    float score;
     Type type;
 
     Node(uint64_t p_hash, Move p_bestMove, uint8_t p_depth, float p_score, Type p_type, int8_t p_mate)
@@ -61,7 +60,6 @@ struct Node
         hash = p_hash;
         bestMove = p_bestMove;
         depth = p_depth;
-        score = p_score;
         type = p_type;
     }
 
@@ -73,26 +71,52 @@ struct Node
 int nodes;
 
 // max hash size in mb
-const unsigned int MAX_HASH = 256;
+const unsigned int MAX_HASH = 1024;
 
 const size_t TT_MAX_SIZE = MAX_HASH * 1000000 / sizeof(Node);
 
 array<Node, TT_MAX_SIZE> tTable = {Node()};
 
-void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &stalemate, vector<Move> &pv, int &ply)
+void orderMoves(vector<thc::Move> &moveList, vector<bool> &mate, vector<bool> &stalemate, vector<Move> &pv, int &ply, uint64_t &hash, thc::ChessRules &board)
 {
     if (ply >= pv.size())
     {
         return;
     }
 
-    for (int i = 0; i < moveList.size(); i++)
+    vector<float> scores(moveList.size(), -100000);
+
+    // selection sort
+    for (int j = 0; j < moveList.size(); j++)
     {
-        if (moveList[i] == pv.at(ply).move)
+        for (int i = j; i < moveList.size(); i++)
         {
-            swap(moveList[i], moveList.at(0));
-            swap(mate[i], mate.at(0));
-            swap(stalemate[i], stalemate.at(0));
+            hash = board.Hash64Update(hash, moveList[i]);
+
+            int ttIndex = hash % TT_MAX_SIZE;
+
+            hash = board.Hash64Update(hash, moveList[i]);
+
+            if (moveList[i] == pv[ply].move)
+            {
+                scores[j] = pv[ply].score;
+
+                swap(moveList[i], moveList[0]);
+                swap(mate[i], mate[0]);
+                swap(stalemate[i], stalemate[0]);
+
+                break;
+            }
+
+            // if stored move score is better
+            else if (tTable[ttIndex].bestMove.score != 0 && -tTable[ttIndex].bestMove.score > scores[j])
+            {
+                scores[j] = -tTable[ttIndex].bestMove.score;
+
+                swap(moveList[i], moveList[j]);
+                swap(mate[i], mate[j]);
+                swap(stalemate[i], stalemate[j]);
+            }
         }
     }
 }
@@ -126,12 +150,12 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
             else if (ttNode.type == LOWERBOUND)
             {
-                alpha = max(alpha, ttNode.score);
+                alpha = max(alpha, ttNode.bestMove.score);
             }
 
             else if (ttNode.type == UPPERBOUND)
             {
-                beta = min(beta, ttNode.score);
+                beta = min(beta, ttNode.bestMove.score);
             }
 
             if (alpha >= beta)
@@ -151,13 +175,11 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
     board.GenLegalMoveList(legalMoves, check, mate, stalemate);
 
-    orderMoves(legalMoves, mate, stalemate, pv, ply);
+    orderMoves(legalMoves, mate, stalemate, pv, ply, hash, board);
 
     Move bestMove(-1000000);
     Move childBestMove;
     Move move;
-
-    vector<Move> childPV;
 
     for (int i = 0; i < legalMoves.size(); i++)
     {
@@ -179,7 +201,7 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
             hash = board.Hash64Update(hash, legalMoves[i]);
 
-            childBestMove = negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, childPV, hash);
+            childBestMove = negamax(child, depth - 1, -beta, -alpha, -color, ply + 1, pv, hash);
 
             move = Move(-childBestMove.score, legalMoves[i]);
 
@@ -190,7 +212,7 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
         {
             bestMove = move;
 
-            if (childBestMove.mate != 0)
+            if (ply <= pv.size() && childBestMove.mate != 0)
             {
                 bestMove.mate = -childBestMove.mate + color;
             }
@@ -208,7 +230,6 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     }
 
     node.bestMove = bestMove;
-    node.score = bestMove.score;
 
     if (bestMove.score <= alphaOrig)
     {
@@ -234,7 +255,7 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     return bestMove;
 }
 
-vector<Move> getPv(uint64_t hash, Move move, uint8_t depth, thc::ChessRules board, int8_t color)
+vector<Move> getPv(uint64_t hash, uint8_t depth, thc::ChessRules board)
 {
     vector<Move> pv;
 
@@ -247,6 +268,8 @@ vector<Move> getPv(uint64_t hash, Move move, uint8_t depth, thc::ChessRules boar
             pv.push_back(node.bestMove);
 
             hash = board.Hash64Update(hash, node.bestMove.move);
+
+            board.PlayMove(node.bestMove.move);
         }
     }
 
@@ -273,14 +296,14 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
             {
                 move = negamax(board, depth, -1000000, 1000000, 1, 0, pv, hash);
 
-                pv = getPv(hash, move, depth, board, 1);
+                pv = getPv(hash, depth, board);
             }
 
             else
             {
                 move = negamax(board, depth, -1000000, 1000000, -1, 0, pv, hash);
 
-                pv = getPv(hash, move, depth, board, -1);
+                pv = getPv(hash, depth, board);
             }
 
             if (uci::searching)

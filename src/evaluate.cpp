@@ -24,7 +24,7 @@ float evaluate(thc::ChessRules &board)
 
                 if (rank < 5 && (file == 4 || file == 3))
                 {
-                    evaluation += 0.4f;
+                    evaluation += 0.8f;
                 }
                 if (rank < 6 && (board.squares[(rank + 1) * 8 + file + 1] == 'P' || board.squares[(rank + 1 * 8) + file - 1] == 'P'))
                 {
@@ -43,7 +43,7 @@ float evaluate(thc::ChessRules &board)
 
                 if (rank > 2 && (file == 4 || file == 3))
                 {
-                    evaluation -= 0.4f;
+                    evaluation -= 0.8f;
                 }
                 //likes pawns being protected by other pawns maybe?
                 if (rank > 1 && (board.squares[(rank - 1) * 8 + file + 1] == 'p' || board.squares[(rank - 1) * 8 + file - 1] == 'p'))
