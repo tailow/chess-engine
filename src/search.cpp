@@ -137,6 +137,7 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     Node ttNode = tTable[hash % TT_MAX_SIZE];
 
     // tranposition
+    /*
     if (ttNode.hash == hash && ttNode.depth >= depth)
     {
         transpositions++;
@@ -161,6 +162,7 @@ Move negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             return ttNode.bestMove;
         }
     }
+    */
 
     vector<thc::Move> legalMoves;
     vector<bool> check;
