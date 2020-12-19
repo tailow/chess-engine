@@ -53,7 +53,6 @@ namespace uci
     void stop()
     {
         searching = false;
-        pondering = false;
         ponderHit = false;
     }
 

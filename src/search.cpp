@@ -58,11 +58,12 @@ array<Node, TT_MAX_SIZE> transpositionTable;
 
 // TODO
 /*
-    TT SACRIFICE FIX
+    TT SACRIFICE FIX (node searched before with high score)
     PLY 1 MOVE ORDER FIX
     PV MOVE NOT #1 FIX
-    SHOWS MATE IN X WHEN ITS NOT
     REPETITION NOT WORKING ?
+    BOT TRIES TO REPEAT WITH OWN MOVES?
+    MATE FOR BLACK IS NEGATIVE
 */
 
 // get legal moves with move ordering
@@ -122,7 +123,7 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
 }
 
 // recursive search with alpha-beta pruning
-Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int color, int ply, vector<thc::Move> &pv, uint64_t &hash)
+Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int color, int ply, vector<thc::Move> &pv, uint64_t hash)
 {
     nodes++;
 
@@ -162,9 +163,10 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     */
 
     thc::DRAWTYPE drawType;
+    board.IsDraw(!board.white, drawType);
 
     // repetition
-    if (board.IsDraw(board.white, drawType))
+    if (drawType != thc::NOT_DRAW && drawType != thc::DRAWTYPE_INSUFFICIENT)
     {
         node.score = 0;
 
@@ -210,13 +212,10 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
     for (int i = 0; i < legalMoves.size(); i++)
     {
-        hash = board.Hash64Update(hash, legalMoves[i]);
-        board.PlayMove(legalMoves[i]);
+        thc::ChessRules childBoard = board;
+        childBoard.PlayMove(legalMoves[i]);
 
-        Node child = negamax(board, depth - 1, -beta, -alpha, -color, ply + 1, pv, hash);
-
-        board.PopMove(legalMoves[i]);
-        hash = board.Hash64Update(hash, legalMoves[i]);
+        Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, board.Hash64Update(hash, legalMoves[i]));
 
         if (-child.score > node.score)
         {
@@ -226,6 +225,11 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             if (child.isMate || child.mate != 0)
             {
                 node.mate = -child.mate + color;
+            }
+
+            else
+            {
+                node.mate = 0;
             }
         }
 
@@ -278,7 +282,6 @@ vector<thc::Move> getPv(uint64_t hash, uint8_t depth, thc::ChessRules board)
             pv.push_back(node.bestMove);
 
             hash = board.Hash64Update(hash, node.bestMove);
-
             board.PlayMove(node.bestMove);
         }
     }
@@ -322,7 +325,6 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
 
                 if (node.mate != 0)
                     score = "mate " + to_string((int)ceil(((double)node.mate) / 2));
-
                 else
                     score = "cp " + to_string((int)(node.score * 100));
 
@@ -343,11 +345,6 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
         }
     }
 
-    while (uci::pondering)
-    {
-        this_thread::sleep_for(0.1s);
-    }
-
     if (prevPv.size() > 0 && !uci::pondering)
     {
         cout << "bestmove " << prevPv.at(0).TerseOut();
@@ -361,4 +358,5 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
     nodes = 0;
 
     uci::searching = false;
+    uci::pondering = false;
 }
