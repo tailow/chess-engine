@@ -25,8 +25,8 @@ struct Node
     float score;
     thc::Move bestMove;
     uint8_t depth;
-    int8_t mate;
-    bool isMate;
+    int8_t mate = 0;
+    bool isMate = false;
     Type type;
 
     Node(uint64_t p_hash, float p_score, thc::Move p_bestMove, uint8_t p_depth, int8_t p_mate, Type p_type)
@@ -56,6 +56,15 @@ const size_t TT_MAX_SIZE = MAX_HASH * 1000000 / sizeof(Node);
 
 array<Node, TT_MAX_SIZE> transpositionTable;
 
+// TODO
+/*
+    TT SACRIFICE FIX
+    PLY 1 MOVE ORDER FIX
+    PV MOVE NOT #1 FIX
+    SHOWS MATE IN X WHEN ITS NOT
+    REPETITION NOT WORKING ?
+*/
+
 // get legal moves with move ordering
 vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash, thc::ChessRules &board)
 {
@@ -81,7 +90,7 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
     // selection sort
     for (int j = 1; j < legalMoves.size(); j++)
     {
-        for (int i = j; i < legalMoves.size(); i++)
+        for (int i = j + 1; i < legalMoves.size(); i++)
         {
             Node node = transpositionTable[board.Hash64Update(hash, legalMoves[i]) % TT_MAX_SIZE];
 
@@ -122,16 +131,10 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     if (!uci::searching)
         return node;
 
-    if (depth == 0)
-    {
-        node.score = color * evaluate(board, node.isMate);
-
-        return node;
-    }
-
     int index = hash % TT_MAX_SIZE;
 
     // transposition
+    /*
     if (transpositionTable[index].hash == hash && transpositionTable[index].depth >= depth)
     {
         node = transpositionTable[index];
@@ -156,14 +159,54 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             return node;
         }
     }
+    */
 
-    node.depth = depth;
-    node.hash = hash;
-    node.score = -1000000;
+    thc::DRAWTYPE drawType;
+
+    // repetition
+    if (board.IsDraw(board.white, drawType))
+    {
+        node.score = 0;
+
+        return node;
+    }
+
+    if (depth == 0)
+    {
+        node.score = color * evaluate(board);
+
+        return node;
+    }
+
+    vector<thc::Move> legalMoves = getLegalMoves(pv, ply, hash, board);
+
+    if (legalMoves.size() == 0)
+    {
+        // mate check
+        if (board.white && board.AttackedPiece(board.wking_square))
+        {
+            node.isMate = true;
+            node.score = -1000;
+        }
+
+        else if (!board.white && board.AttackedPiece(board.bking_square))
+        {
+            node.isMate = true;
+            node.score = -1000;
+        }
+
+        // stalemate
+        else
+        {
+            node.score = 0;
+        }
+
+        return node;
+    }
 
     double alphaOrig = alpha;
 
-    vector<thc::Move> legalMoves = getLegalMoves(pv, ply, hash, board);
+    node.score = -1000000;
 
     for (int i = 0; i < legalMoves.size(); i++)
     {
@@ -197,6 +240,9 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     // store table entry
     if (transpositionTable[hash % TT_MAX_SIZE].depth <= depth && uci::searching)
     {
+        node.depth = depth;
+        node.hash = hash;
+
         if (node.score <= alphaOrig)
         {
             node.type = UPPERBOUND;

@@ -3,59 +3,9 @@
 
 using namespace std;
 
-float evaluate(thc::ChessRules &board, bool &mate)
+float evaluate(thc::ChessRules &board)
 {
     float evaluation = 0;
-
-    // white under check
-    if (board.white && board.AttackedPiece(board.wking_square))
-    {
-        vector<thc::Move> legalMoves;
-
-        board.GenLegalMoveList(legalMoves);
-
-        // mate check
-        if (legalMoves.size() == 0)
-        {
-            mate = true;
-            return -1000000;
-        }
-    }
-
-    else if (!board.white && board.AttackedPiece(board.bking_square))
-    {
-        vector<thc::Move> legalMoves;
-
-        board.GenLegalMoveList(legalMoves);
-
-        // mate check
-        if (legalMoves.size() == 0)
-        {
-            mate = true;
-            return 1000;
-        }
-    }
-
-    // stalemate check, doesn't work with fen
-    else if (board.full_move_count > 20)
-    {
-        vector<thc::Move> legalMoves;
-
-        board.GenLegalMoveList(legalMoves);
-
-        if (legalMoves.size() == 0)
-        {
-            return 0;
-        }
-    }
-
-    // repetition check
-    thc::DRAWTYPE drawType;
-
-    if (board.IsDraw(board.white, drawType))
-    {
-        return 0;
-    }
 
     // Queens alive?
     bool wkingSafety = true;
