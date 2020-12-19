@@ -58,12 +58,11 @@ array<Node, TT_MAX_SIZE> transpositionTable;
 
 // TODO
 /*
-    TT SACRIFICE FIX (node searched before with high score)
-    PLY 1 MOVE ORDER FIX
-    PV MOVE NOT #1 FIX
-    REPETITION NOT WORKING ?
-    BOT TRIES TO REPEAT WITH OWN MOVES?
-    MATE FOR BLACK IS NEGATIVE
+    TT SACRIFICE FIX (node searched before with high score)    
+    BOT TRIES TO REPEAT WITH OWN MOVES WITH TT
+    PLY 1 MOVE ORDER FIX ?
+    PV MOVE NOT #1 FIX ?
+    REPETITION NOT WORKING
 */
 
 // get legal moves with move ordering
@@ -224,7 +223,12 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
             if (child.isMate || child.mate != 0)
             {
-                node.mate = -child.mate + color;
+                if (child.mate < 0)
+                    node.mate = -child.mate + 1;
+                else if (child.mate > 0)
+                    node.mate = -child.mate - 1;
+                else
+                    node.mate = 1;
             }
 
             else
