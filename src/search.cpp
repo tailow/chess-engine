@@ -59,10 +59,7 @@ array<Node, TT_MAX_SIZE> transpositionTable;
 
 // TODO
 /*
-    TT SACRIFICE FIX (node searched before with high score)    
-    BOT TRIES TO REPEAT WITH OWN MOVES WITH TT
-    PLY 1 MOVE ORDER FIX ?
-    PV MOVE NOT #1 FIX ?
+    HASH COLLISION FIX
     REPETITION NOT WORKING
 */
 
@@ -135,6 +132,7 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     double alphaOrig = alpha;
 
     // transposition
+    /*
     if (transpositionTable[index].hash == hash && transpositionTable[index].depth >= depth)
     {
         node = transpositionTable[index];
@@ -159,6 +157,7 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             return node;
         }
     }
+    */
 
     thc::DRAWTYPE drawType;
     board.IsDraw(true, drawType);
@@ -243,13 +242,13 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     }
 
     // debug type 1 collision
+    /*
     if (transpositionTable[hash % TT_MAX_SIZE].depth == depth && depth != 0)
     {
         if (transpositionTable[hash % TT_MAX_SIZE].score != node.score)
         {
             hashCollisions++;
 
-            /*
             cout << board.ToDebugStr() << endl;
             cout << node.score << endl;
             cout << transpositionTable[hash % TT_MAX_SIZE].score << endl;
@@ -257,9 +256,9 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             cout << transpositionTable[hash % TT_MAX_SIZE].bestMove.TerseOut() << endl;
             cout << to_string(node.depth) << endl;
             cout << to_string(transpositionTable[hash % TT_MAX_SIZE].depth) << endl;
-            */
         }
     }
+    */
 
     // store table entry
     if (transpositionTable[hash % TT_MAX_SIZE].depth < depth && uci::searching)
@@ -364,7 +363,7 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
 
                 cout << endl;
 
-                cout << hashCollisions << endl;
+                //cout << hashCollisions << endl;
             }
         }
     }
@@ -379,8 +378,12 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
         cout << endl;
     }
 
+    while (uci::pondering)
+    {
+        this_thread::sleep_for(0.1s);
+    }
+
     nodes = 0;
 
     uci::searching = false;
-    uci::pondering = false;
 }
