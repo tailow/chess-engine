@@ -44,12 +44,12 @@ float evaluate(thc::ChessRules &board)
                 {
                     evaluation -= 0.8f;
                 }
-                //likes pawns being protected by other pawns maybe?
+
                 if (rank > 1 && (board.squares[(rank - 1) * 8 + file + 1] == 'p' || board.squares[(rank - 1) * 8 + file - 1] == 'p'))
                 {
                     evaluation -= 0.3f;
                 }
-                //doesnt like doubled pawns
+
                 if (board.squares[(rank - 1) * 8 + file] == 'p')
                 {
                     evaluation += 0.19f;
@@ -63,7 +63,7 @@ float evaluate(thc::ChessRules &board)
 
                 if (rank == 7)
                 {
-                    evaluation -= 0.33f;
+                    evaluation -= 0.5f;
                 }
                 if (file == 0 || file == 7)
                 {
@@ -78,7 +78,7 @@ float evaluate(thc::ChessRules &board)
 
                 if (rank == 0)
                 {
-                    evaluation += 0.33f;
+                    evaluation += 0.5f;
                 }
                 if (file == 0 || file == 7)
                 {
@@ -95,7 +95,7 @@ float evaluate(thc::ChessRules &board)
                 {
                     evaluation -= 0.2f;
                 }
-                if (rank == 6 && (file == 1 || file == 6))
+                else if (rank == 6 && (file == 1 || file == 6))
                 {
                     evaluation += 0.35f;
                 }
@@ -110,7 +110,7 @@ float evaluate(thc::ChessRules &board)
                 {
                     evaluation += 0.2f;
                 }
-                if (rank == 1 && (file == 1 || file == 6))
+                else if (rank == 1 && (file == 1 || file == 6))
                 {
                     evaluation -= 0.35f;
                 }
@@ -129,11 +129,6 @@ float evaluate(thc::ChessRules &board)
                 {
                     evaluation -= 0.22f;
                 }
-                // likes rooks next to each other
-                if (!((rank * 8 + file + 1) == 'R' || (rank * 8 + file + -1) == 'R'))
-                {
-                    evaluation -= 0.3f;
-                }
 
                 break;
             }
@@ -148,11 +143,6 @@ float evaluate(thc::ChessRules &board)
                 if (!(rank == 0 || rank == 1 || rank == 6 || rank == 7))
                 {
                     evaluation += 0.22f;
-                }
-                // likes rooks next to each other
-                if (!((rank * 8 + file + 1) == 'r' || (rank * 8 + file + -1) == 'r'))
-                {
-                    evaluation += 0.3f;
                 }
 
                 break;

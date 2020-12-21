@@ -2142,6 +2142,7 @@ uint64_t ChessPosition::Hash64Calculate()
 uint64_t ChessPosition::Hash64Update(uint64_t hash_in, Move move)
 {
     uint64_t hash = hash_in;
+
     switch (move.special)
     {
     default:
