@@ -167,8 +167,6 @@ namespace uci
                         thc::Move move;
                         move.TerseIn(&board, tokens.at(i).c_str());
 
-                        hash = board.Hash64Update(hash, move);
-
                         board.PlayMove(move);
                     }
                 }
@@ -195,8 +193,6 @@ namespace uci
                 {
                     thc::Move move;
                     move.TerseIn(&board, tokens.at(i).c_str());
-
-                    hash = board.Hash64Update(hash, move);
 
                     board.PlayMove(move);
                 }

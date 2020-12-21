@@ -210,6 +210,8 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
         thc::ChessRules childBoard = board;
         childBoard.PlayMove(legalMoves[i]);
 
+        //cout << childBoard.GetRepetitionCount() << " " << legalMoves[i].TerseOut() << endl;
+
         Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, board.Hash64Update(hash, legalMoves[i]));
 
         if (-child.score > node.score)
