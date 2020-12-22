@@ -324,6 +324,7 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
     vector<thc::Move> prevPv;
 
     Node node;
+    Node prevNode;
 
     for (int depth = 1; depth <= maxDepth; depth++)
     {
@@ -339,6 +340,8 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
             if (uci::searching)
             {
                 prevPv = pv;
+                prevNode = node;
+
                 string score;
 
                 auto stopTime = Time::now();
@@ -370,9 +373,9 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
         }
     }
 
-    if (prevPv.size() > 0 && !uci::pondering)
+    if (!uci::pondering)
     {
-        cout << "bestmove " << prevPv.at(0).TerseOut();
+        cout << "bestmove " << prevNode.bestMove.TerseOut();
 
         if (prevPv.size() > 1)
             cout << " ponder " << prevPv.at(1).TerseOut();
