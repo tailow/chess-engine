@@ -21,6 +21,8 @@ namespace uci
 
     int timeLeft = 60000;
     int timeControl = 0;
+    int increment = 0;
+    int blackIncrement = 0;
 
     uint64_t hash;
 
@@ -76,6 +78,16 @@ namespace uci
                 timeLeft = stoi(tokens.at(i + 1));
             }
 
+            else if (tokens.at(i) == "winc" && board.white)
+            {
+                increment = stoi(tokens.at(i + 1));
+            }
+
+            else if (tokens.at(i) == "binc" && !board.white)
+            {
+                increment = stoi(tokens.at(i + 1));
+            }
+
             else if (tokens.at(i) == "infinite")
             {
                 maxDepth = 100;
@@ -107,13 +119,13 @@ namespace uci
         if (timer.joinable())
             timer.join();
 
-        // start new searcher thread if ponder move not played
+        // start a new searcher thread if ponder move was not played
         if (!ponderHit)
             searcher = thread(search, board, maxDepth, hash);
 
         if (useTimer)
         {
-            timer = thread(timeman, timeControl, timeLeft);
+            timer = thread(timeman, timeControl, timeLeft, increment);
         }
 
         ponderHit = false;

@@ -1,3 +1,3 @@
 #pragma once
 
-void timeman(int timeControl, int timeLeft);
+void timeman(int timeControl, int timeLeft, int increment);

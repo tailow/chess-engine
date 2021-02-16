@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void timeman(int timeControl, int timeLeft)
+void timeman(int timeControl, int timeLeft, int increment)
 {
     uci::searching = true;
 
@@ -13,7 +13,7 @@ void timeman(int timeControl, int timeLeft)
 
     auto startTime = Time::now();
 
-    int maxTime = min(timeControl / 60, timeLeft / 2);
+    int maxTime = min(timeControl / 60 + increment, timeLeft / 2);
 
     while (uci::searching)
     {
