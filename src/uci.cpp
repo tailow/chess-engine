@@ -22,8 +22,7 @@ namespace uci
     int timeLeft = 60000;
     int timeControl = 0;
     int increment = 0;
-    int blackIncrement = 0;
-
+    
     uint64_t hash;
 
     bool searching = false;

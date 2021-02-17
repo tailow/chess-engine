@@ -57,12 +57,6 @@ const size_t TT_MAX_SIZE = MAX_HASH * 1000000 / sizeof(Node);
 
 array<Node, TT_MAX_SIZE> transpositionTable;
 
-// TODO
-/*
-    HASH COLLISION FIX
-    REPETITION NOT WORKING
-*/
-
 // get legal moves with move ordering
 vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash, thc::ChessRules &board)
 {
@@ -101,20 +95,6 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
             }
         }
     }
-
-    /*
-    if (ply == 0)
-    {
-        cout << endl;
-
-        for (int i = 0; i < legalMoves.size(); i++)
-        {
-            cout << legalMoves[i].TerseOut() << ": " << scores[i] << endl;
-        }
-
-        cout << endl;
-    }
-    */
 
     return legalMoves;
 }
@@ -210,8 +190,6 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
         thc::ChessRules childBoard = board;
         childBoard.PlayMove(legalMoves[i]);
 
-        //cout << childBoard.GetRepetitionCount() << " " << legalMoves[i].TerseOut() << endl;
-
         Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, board.Hash64Update(hash, legalMoves[i]));
 
         if (-child.score > node.score)
@@ -242,25 +220,6 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             break;
         }
     }
-
-    // debug type 1 collision
-    /*
-    if (transpositionTable[hash % TT_MAX_SIZE].depth == depth && depth != 0)
-    {
-        if (transpositionTable[hash % TT_MAX_SIZE].score != node.score)
-        {
-            hashCollisions++;
-
-            cout << board.ToDebugStr() << endl;
-            cout << node.score << endl;
-            cout << transpositionTable[hash % TT_MAX_SIZE].score << endl;
-            cout << node.bestMove.TerseOut() << endl;
-            cout << transpositionTable[hash % TT_MAX_SIZE].bestMove.TerseOut() << endl;
-            cout << to_string(node.depth) << endl;
-            cout << to_string(transpositionTable[hash % TT_MAX_SIZE].depth) << endl;
-        }
-    }
-    */
 
     // store table entry
     if (transpositionTable[hash % TT_MAX_SIZE].depth < depth && uci::searching)
@@ -367,8 +326,6 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
                 }
 
                 cout << endl;
-
-                //cout << hashCollisions << endl;
             }
         }
     }
