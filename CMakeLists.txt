@@ -9,7 +9,9 @@ add_executable(seggz ./src/main.cpp
                      ./src/evaluate.cpp 
                      ./src/evaluate.h
                      ./src/timeman.cpp
-                     ./src/timeman.h)
+                     ./src/timeman.h
+                     ./src/hash.cpp
+                     ./src/hash.h)
                      
 add_library(thc 
             ./lib/thc/thc.cpp 
