@@ -8,5 +8,7 @@ using namespace std;
 
 int main()
 {
+    hsh::generateRandomNumbers();
+
     uci::loop();
 }
