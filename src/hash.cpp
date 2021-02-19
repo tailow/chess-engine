@@ -73,10 +73,117 @@ namespace hsh
 
     uint64_t generateHash(thc::ChessRules board)
     {
-        return 0;
+        uint64_t hash = 0;
+
+        for (int i = 0; i < 64; i++)
+        {
+            switch (board.squares[i])
+            {
+            case 'P':
+            {
+                hash ^= whitePawn[i];
+                break;
+            }
+            case 'N':
+            {
+                hash ^= whiteKnight[i];
+                break;
+            }
+            case 'B':
+            {
+                hash ^= whiteBishop[i];
+                break;
+            }
+            case 'R':
+            {
+                hash ^= whiteRook[i];
+                break;
+            }
+            case 'Q':
+            {
+                hash ^= whiteQueen[i];
+                break;
+            }
+            case 'K':
+            {
+                hash ^= whiteKing[i];
+                break;
+            }
+            case 'p':
+            {
+                hash ^= blackPawn[i];
+                break;
+            }
+            case 'n':
+            {
+                hash ^= blackKnight[i];
+                break;
+            }
+            case 'b':
+            {
+                hash ^= blackBishop[i];
+                break;
+            }
+            case 'r':
+            {
+                hash ^= blackRook[i];
+                break;
+            }
+            case 'q':
+            {
+                hash ^= blackQueen[i];
+                break;
+            }
+            case 'k':
+            {
+                hash ^= blackKing[i];
+                break;
+            }
+            }
+        }
+
+        for (int rank = 0; rank < 8; rank++)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                if (board.enpassant_target == rank * 8 + file)
+                {
+                    hash ^= enPassantFile[file];
+                    break;
+                }
+            }
+        }
+
+        if (board.wking == 1)
+        {
+            hash ^= whiteShortCastle;
+        }
+
+        if (board.wqueen == 1)
+        {
+            hash ^= whiteLongCastle;
+        }
+
+        if (board.bking == 1)
+        {
+            hash ^= blackShortCastle;
+        }
+
+        if (board.bqueen == 1)
+        {
+            hash ^= blackLongCastle;
+        }
+
+        if (!board.white)
+        {
+            hash ^= blackToMove;
+        }
+
+        return hash;
     }
 
-    void updateHash(uint64_t *hash, thc::ChessRules board, thc::Move move)
+    void updateHash(uint64_t &hash, thc::ChessRules board, thc::Move move)
     {
+        hash ^= blackToMove;
     }
 }

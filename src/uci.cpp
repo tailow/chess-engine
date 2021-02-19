@@ -9,6 +9,7 @@
 #include "search.h"
 #include "evaluate.h"
 #include "timeman.h"
+#include "hash.h"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ namespace uci
     int timeLeft = 60000;
     int timeControl = 0;
     int increment = 0;
-    
+
     uint64_t hash;
 
     bool searching = false;
@@ -63,7 +64,11 @@ namespace uci
         useTimer = true;
         maxDepth = defaultMaxDepth;
 
-        hash = board.Hash64Calculate();
+        hash = hsh::generateHash(board);
+
+        cout << board.ToDebugStr() << endl;
+
+        cout << hash << endl;
 
         for (unsigned int i = 1; i < tokens.size(); i++)
         {
@@ -195,6 +200,8 @@ namespace uci
 
                 fen += tokens.at(i) + " ";
             }
+
+            // fix
 
             board.Forsyth(fen.c_str());
 
