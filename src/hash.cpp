@@ -1,7 +1,9 @@
-#include "../lib/thc/thc.h"
 #include <cstdint>
 #include <array>
 #include <random>
+#include <iostream>
+
+#include "../lib/thc/thc.h"
 
 using namespace std;
 
@@ -71,7 +73,7 @@ namespace hsh
         blackToMove = getRandomNumber(2004);
     }
 
-    uint64_t generateHash(thc::ChessRules board)
+    uint64_t generateHash(thc::ChessRules &board)
     {
         uint64_t hash = 0;
 
@@ -182,8 +184,175 @@ namespace hsh
         return hash;
     }
 
-    void updateHash(uint64_t &hash, thc::ChessRules board, thc::Move move)
+    void updateHash(uint64_t &hash, thc::ChessRules &board, thc::Move &move)
     {
         hash ^= blackToMove;
+
+        // promotion
+
+        // en passant
+
+        // castle
+
+        // king move
+        if (move.special == thc::SPECIAL_KING_MOVE)
+        {
+            if (board.white)
+            {
+                hash ^= whiteShortCastle;
+                hash ^= whiteLongCastle;
+            }
+
+            else
+            {
+                hash ^= blackShortCastle;
+                hash ^= blackLongCastle;
+            }
+        }
+
+        switch (board.squares[move.src])
+        {
+        case 'P':
+        {
+            hash ^= whitePawn[move.src];
+            hash ^= whitePawn[move.dst];
+            break;
+        }
+        case 'N':
+        {
+            hash ^= whiteKnight[move.src];
+            hash ^= whiteKnight[move.dst];
+            break;
+        }
+        case 'B':
+        {
+            hash ^= whiteBishop[move.src];
+            hash ^= whiteBishop[move.dst];
+            break;
+        }
+        case 'R':
+        {
+            hash ^= whiteRook[move.src];
+            hash ^= whiteRook[move.dst];
+            break;
+        }
+        case 'Q':
+        {
+            hash ^= whiteQueen[move.src];
+            hash ^= whiteQueen[move.dst];
+            break;
+        }
+        case 'K':
+        {
+            hash ^= whiteKing[move.src];
+            hash ^= whiteKing[move.dst];
+            break;
+        }
+        case 'p':
+        {
+            hash ^= blackPawn[move.src];
+            hash ^= blackPawn[move.dst];
+            break;
+        }
+        case 'n':
+        {
+            hash ^= blackKnight[move.src];
+            hash ^= blackKnight[move.dst];
+            break;
+        }
+        case 'b':
+        {
+            hash ^= blackBishop[move.src];
+            hash ^= blackBishop[move.dst];
+            break;
+        }
+        case 'r':
+        {
+            hash ^= blackRook[move.src];
+            hash ^= blackRook[move.dst];
+            break;
+        }
+        case 'q':
+        {
+            hash ^= blackQueen[move.src];
+            hash ^= blackQueen[move.dst];
+            break;
+        }
+        case 'k':
+        {
+            hash ^= blackKing[move.src];
+            hash ^= blackKing[move.dst];
+            break;
+        }
+        }
+
+        // capture
+        if (board.squares[move.dst] != ' ')
+        {
+            cout << "capture" << endl;
+            switch (board.squares[move.dst])
+            {
+            case 'P':
+            {
+                hash ^= whitePawn[move.dst];
+                break;
+            }
+            case 'N':
+            {
+                hash ^= whiteKnight[move.dst];
+                break;
+            }
+            case 'B':
+            {
+                hash ^= whiteBishop[move.dst];
+                break;
+            }
+            case 'R':
+            {
+                hash ^= whiteRook[move.dst];
+                break;
+            }
+            case 'Q':
+            {
+                hash ^= whiteQueen[move.dst];
+                break;
+            }
+            case 'K':
+            {
+                hash ^= whiteKing[move.dst];
+                break;
+            }
+            case 'p':
+            {
+                hash ^= blackPawn[move.dst];
+                break;
+            }
+            case 'n':
+            {
+                hash ^= blackKnight[move.dst];
+                break;
+            }
+            case 'b':
+            {
+                hash ^= blackBishop[move.dst];
+                break;
+            }
+            case 'r':
+            {
+                hash ^= blackRook[move.dst];
+                break;
+            }
+            case 'q':
+            {
+                hash ^= blackQueen[move.dst];
+                break;
+            }
+            case 'k':
+            {
+                hash ^= blackKing[move.dst];
+                break;
+            }
+            }
+        }
     }
 }
