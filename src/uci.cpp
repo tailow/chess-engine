@@ -66,8 +66,6 @@ namespace uci
 
         hash = hsh::generateHash(board);
 
-        cout << board.ToDebugStr() << endl;
-
         cout << hash << endl;
 
         for (unsigned int i = 1; i < tokens.size(); i++)
@@ -201,13 +199,11 @@ namespace uci
                 fen += tokens.at(i) + " ";
             }
 
-            // fix
-
             board.Forsyth(fen.c_str());
 
             if (tokens.size() > 8)
             {
-                for (int i = 7; i < tokens.size(); i++)
+                for (int i = 9; i < tokens.size(); i++)
                 {
                     thc::Move move;
                     move.TerseIn(&board, tokens.at(i).c_str());
