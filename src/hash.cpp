@@ -193,17 +193,52 @@ namespace hsh
         // en passant
 
         // castle
+        if (move.special == thc::SPECIAL_WK_CASTLING)
+        {
+            hash ^= whiteRook[63];
+            hash ^= whiteRook[61];
+
+            hash ^= whiteShortCastle;
+            hash ^= whiteLongCastle;
+        }
+
+        else if (move.special == thc::SPECIAL_WQ_CASTLING)
+        {
+            hash ^= whiteRook[56];
+            hash ^= whiteRook[59];
+
+            hash ^= whiteShortCastle;
+            hash ^= whiteLongCastle;
+        }
+
+        else if (move.special == thc::SPECIAL_BK_CASTLING)
+        {
+            hash ^= blackRook[7];
+            hash ^= blackRook[5];
+
+            hash ^= blackShortCastle;
+            hash ^= blackLongCastle;
+        }
+
+        else if (move.special == thc::SPECIAL_BQ_CASTLING)
+        {
+            hash ^= blackRook[0];
+            hash ^= blackRook[3];
+
+            hash ^= blackShortCastle;
+            hash ^= blackLongCastle;
+        }
 
         // king move
-        if (move.special == thc::SPECIAL_KING_MOVE)
+        else if (move.special == thc::SPECIAL_KING_MOVE)
         {
-            if (board.white)
+            if (board.white && board.wking_allowed())
             {
                 hash ^= whiteShortCastle;
                 hash ^= whiteLongCastle;
             }
 
-            else
+            else if (!board.white && board.bking_allowed())
             {
                 hash ^= blackShortCastle;
                 hash ^= blackLongCastle;
@@ -289,7 +324,6 @@ namespace hsh
         // capture
         if (board.squares[move.dst] != ' ')
         {
-            cout << "capture" << endl;
             switch (board.squares[move.dst])
             {
             case 'P':
