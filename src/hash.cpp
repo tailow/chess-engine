@@ -188,10 +188,6 @@ namespace hsh
     {
         hash ^= blackToMove;
 
-        // promotion
-
-        // en passant
-
         // castle
         if (move.special == thc::SPECIAL_WK_CASTLING)
         {
@@ -250,7 +246,33 @@ namespace hsh
         case 'P':
         {
             hash ^= whitePawn[move.src];
-            hash ^= whitePawn[move.dst];
+
+            if (move.special == thc::NOT_SPECIAL)
+            {
+                hash ^= whitePawn[move.dst];
+            }
+
+            // promotion
+            else if (move.special == thc::SPECIAL_PROMOTION_QUEEN)
+            {
+                hash ^= whiteQueen[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_KNIGHT)
+            {
+                hash ^= whiteKnight[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_BISHOP)
+            {
+                hash ^= whiteBishop[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_ROOK)
+            {
+                hash ^= whiteRook[move.dst];
+            }
+
             break;
         }
         case 'N':
@@ -286,7 +308,33 @@ namespace hsh
         case 'p':
         {
             hash ^= blackPawn[move.src];
-            hash ^= blackPawn[move.dst];
+
+            if (move.special == thc::NOT_SPECIAL)
+            {
+                hash ^= blackPawn[move.dst];
+            }
+
+            // promotion
+            else if (move.special == thc::SPECIAL_PROMOTION_QUEEN)
+            {
+                hash ^= blackQueen[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_KNIGHT)
+            {
+                hash ^= blackKnight[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_BISHOP)
+            {
+                hash ^= blackBishop[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_ROOK)
+            {
+                hash ^= blackRook[move.dst];
+            }
+
             break;
         }
         case 'n':
@@ -324,68 +372,71 @@ namespace hsh
         // capture
         if (board.squares[move.dst] != ' ')
         {
-            switch (board.squares[move.dst])
+            if (move.special != thc::SPECIAL_WEN_PASSANT && move.special != thc::SPECIAL_BEN_PASSANT)
             {
-            case 'P':
-            {
-                hash ^= whitePawn[move.dst];
-                break;
-            }
-            case 'N':
-            {
-                hash ^= whiteKnight[move.dst];
-                break;
-            }
-            case 'B':
-            {
-                hash ^= whiteBishop[move.dst];
-                break;
-            }
-            case 'R':
-            {
-                hash ^= whiteRook[move.dst];
-                break;
-            }
-            case 'Q':
-            {
-                hash ^= whiteQueen[move.dst];
-                break;
-            }
-            case 'K':
-            {
-                hash ^= whiteKing[move.dst];
-                break;
-            }
-            case 'p':
-            {
-                hash ^= blackPawn[move.dst];
-                break;
-            }
-            case 'n':
-            {
-                hash ^= blackKnight[move.dst];
-                break;
-            }
-            case 'b':
-            {
-                hash ^= blackBishop[move.dst];
-                break;
-            }
-            case 'r':
-            {
-                hash ^= blackRook[move.dst];
-                break;
-            }
-            case 'q':
-            {
-                hash ^= blackQueen[move.dst];
-                break;
-            }
-            case 'k':
-            {
-                hash ^= blackKing[move.dst];
-                break;
-            }
+                switch (board.squares[move.dst])
+                {
+                case 'P':
+                {
+                    hash ^= whitePawn[move.dst];
+                    break;
+                }
+                case 'N':
+                {
+                    hash ^= whiteKnight[move.dst];
+                    break;
+                }
+                case 'B':
+                {
+                    hash ^= whiteBishop[move.dst];
+                    break;
+                }
+                case 'R':
+                {
+                    hash ^= whiteRook[move.dst];
+                    break;
+                }
+                case 'Q':
+                {
+                    hash ^= whiteQueen[move.dst];
+                    break;
+                }
+                case 'K':
+                {
+                    hash ^= whiteKing[move.dst];
+                    break;
+                }
+                case 'p':
+                {
+                    hash ^= blackPawn[move.dst];
+                    break;
+                }
+                case 'n':
+                {
+                    hash ^= blackKnight[move.dst];
+                    break;
+                }
+                case 'b':
+                {
+                    hash ^= blackBishop[move.dst];
+                    break;
+                }
+                case 'r':
+                {
+                    hash ^= blackRook[move.dst];
+                    break;
+                }
+                case 'q':
+                {
+                    hash ^= blackQueen[move.dst];
+                    break;
+                }
+                case 'k':
+                {
+                    hash ^= blackKing[move.dst];
+                    break;
+                }
+                }
             }
         }
     }
