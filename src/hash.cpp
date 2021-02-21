@@ -365,78 +365,90 @@ namespace hsh
         {
             hash ^= blackKing[move.src];
             hash ^= blackKing[move.dst];
+
             break;
         }
         }
 
-        // capture
-        if (board.squares[move.dst] != ' ')
+        // en passant
+        if (move.special == thc::SPECIAL_WEN_PASSANT)
         {
-            if (move.special != thc::SPECIAL_WEN_PASSANT && move.special != thc::SPECIAL_BEN_PASSANT)
+            hash ^= blackPawn[move.dst + 8];
+            hash ^= enPassantFile[move.dst % 8];
+        }
+
+        else if (move.special == thc::SPECIAL_BEN_PASSANT)
+        {
+            hash ^= whitePawn[move.dst - 8];
+            hash ^= enPassantFile[move.dst % 8];
+        }
+
+        // capture
+        else if (board.squares[move.dst] != ' ')
+        {
+            switch (board.squares[move.dst])
             {
-                switch (board.squares[move.dst])
-                {
-                case 'P':
-                {
-                    hash ^= whitePawn[move.dst];
-                    break;
-                }
-                case 'N':
-                {
-                    hash ^= whiteKnight[move.dst];
-                    break;
-                }
-                case 'B':
-                {
-                    hash ^= whiteBishop[move.dst];
-                    break;
-                }
-                case 'R':
-                {
-                    hash ^= whiteRook[move.dst];
-                    break;
-                }
-                case 'Q':
-                {
-                    hash ^= whiteQueen[move.dst];
-                    break;
-                }
-                case 'K':
-                {
-                    hash ^= whiteKing[move.dst];
-                    break;
-                }
-                case 'p':
-                {
-                    hash ^= blackPawn[move.dst];
-                    break;
-                }
-                case 'n':
-                {
-                    hash ^= blackKnight[move.dst];
-                    break;
-                }
-                case 'b':
-                {
-                    hash ^= blackBishop[move.dst];
-                    break;
-                }
-                case 'r':
-                {
-                    hash ^= blackRook[move.dst];
-                    break;
-                }
-                case 'q':
-                {
-                    hash ^= blackQueen[move.dst];
-                    break;
-                }
-                case 'k':
-                {
-                    hash ^= blackKing[move.dst];
-                    break;
-                }
-                }
+            case 'P':
+            {
+                hash ^= whitePawn[move.dst];
+
+                break;
+            }
+            case 'N':
+            {
+                hash ^= whiteKnight[move.dst];
+                break;
+            }
+            case 'B':
+            {
+                hash ^= whiteBishop[move.dst];
+                break;
+            }
+            case 'R':
+            {
+                hash ^= whiteRook[move.dst];
+                break;
+            }
+            case 'Q':
+            {
+                hash ^= whiteQueen[move.dst];
+                break;
+            }
+            case 'K':
+            {
+                hash ^= whiteKing[move.dst];
+                break;
+            }
+            case 'p':
+            {
+                hash ^= blackPawn[move.dst];
+                break;
+            }
+            case 'n':
+            {
+                hash ^= blackKnight[move.dst];
+                break;
+            }
+            case 'b':
+            {
+                hash ^= blackBishop[move.dst];
+                break;
+            }
+            case 'r':
+            {
+                hash ^= blackRook[move.dst];
+                break;
+            }
+            case 'q':
+            {
+                hash ^= blackQueen[move.dst];
+                break;
+            }
+            case 'k':
+            {
+                hash ^= blackKing[move.dst];
+                break;
+            }
             }
         }
     }
