@@ -251,6 +251,7 @@ namespace hsh
             else if (move.special == thc::SPECIAL_WPAWN_2SQUARES)
             {
                 hash ^= enPassantFile[move.dst % 8];
+                hash ^= whitePawn[move.dst];
             }
 
             // en passant
@@ -326,6 +327,7 @@ namespace hsh
             else if (move.special == thc::SPECIAL_BPAWN_2SQUARES)
             {
                 hash ^= enPassantFile[move.dst % 8];
+                hash ^= blackPawn[move.dst];
             }
 
             // en passant
