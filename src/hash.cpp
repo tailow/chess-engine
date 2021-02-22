@@ -149,6 +149,8 @@ namespace hsh
         if (board.enpassant_target != 64)
         {
             hash ^= enPassantFile[board.enpassant_target % 8];
+
+            previousEnPassantFile = board.enpassant_target % 8;
         }
 
         if (board.wking == 1)
@@ -187,6 +189,8 @@ namespace hsh
         {
             hash ^= enPassantFile[previousEnPassantFile];
         }
+
+        cout << previousEnPassantFile << endl;
 
         previousEnPassantFile = -1;
 
