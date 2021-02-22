@@ -32,7 +32,7 @@ namespace hsh
 
     uint64_t blackToMove;
 
-    int previousEnPassantFile;
+    int previousEnPassantFile = -1;
 
     uint64_t getRandomNumber(uint32_t seed)
     {
@@ -183,6 +183,13 @@ namespace hsh
     {
         hash ^= blackToMove;
 
+        if (previousEnPassantFile != -1)
+        {
+            hash ^= enPassantFile[previousEnPassantFile];
+        }
+
+        previousEnPassantFile = -1;
+
         // castle
         if (move.special == thc::SPECIAL_WK_CASTLING)
         {
@@ -252,6 +259,8 @@ namespace hsh
             {
                 hash ^= enPassantFile[move.dst % 8];
                 hash ^= whitePawn[move.dst];
+
+                previousEnPassantFile = move.dst % 8;
             }
 
             // en passant
@@ -328,6 +337,8 @@ namespace hsh
             {
                 hash ^= enPassantFile[move.dst % 8];
                 hash ^= blackPawn[move.dst];
+
+                previousEnPassantFile = move.dst % 8;
             }
 
             // en passant
