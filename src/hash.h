@@ -9,5 +9,5 @@ namespace hsh
 
     void generateRandomNumbers();
 
-    void updateHash(uint64_t &hash, thc::ChessRules &board, thc::Move &move);
+    uint64_t updateHash(uint64_t hash, thc::ChessRules &board, thc::Move &move);
 }

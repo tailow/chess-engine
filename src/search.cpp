@@ -8,6 +8,7 @@
 #include "uci.h"
 #include "evaluate.h"
 #include "../lib/thc/thc.h"
+#include "hash.h"
 
 using namespace std;
 using namespace chrono_literals;
@@ -84,7 +85,8 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
     {
         for (int i = j + 1; i < legalMoves.size(); i++)
         {
-            Node node = transpositionTable[board.Hash64Update(hash, legalMoves[i]) % TT_MAX_SIZE];
+            //Node node = transpositionTable[board.Hash64Update(hash, legalMoves[i]) % TT_MAX_SIZE];
+            Node node = transpositionTable[hsh::updateHash(hash, board, legalMoves[i]) % TT_MAX_SIZE];
 
             // if stored move score is better
             if (node.score != 0 && -node.score > scores[j])
@@ -112,7 +114,6 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     double alphaOrig = alpha;
 
     // transposition
-    /*
     if (transpositionTable[index].hash == hash && transpositionTable[index].depth >= depth)
     {
         node = transpositionTable[index];
@@ -137,7 +138,6 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             return node;
         }
     }
-    */
 
     thc::DRAWTYPE drawType;
     board.IsDraw(true, drawType);
@@ -190,7 +190,8 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
         thc::ChessRules childBoard = board;
         childBoard.PlayMove(legalMoves[i]);
 
-        Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, board.Hash64Update(hash, legalMoves[i]));
+        //Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, board.Hash64Update(hash, legalMoves[i]));
+        Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, hsh::updateHash(hash, board, legalMoves[i]));
 
         if (-child.score > node.score)
         {
@@ -263,7 +264,9 @@ vector<thc::Move> getPv(uint64_t hash, uint8_t depth, thc::ChessRules board)
         {
             pv.push_back(node.bestMove);
 
-            hash = board.Hash64Update(hash, node.bestMove);
+            //hash = board.Hash64Update(hash, node.bestMove);
+            hash = hsh::updateHash(hash, board, node.bestMove);
+
             board.PlayMove(node.bestMove);
         }
     }

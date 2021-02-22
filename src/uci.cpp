@@ -64,9 +64,7 @@ namespace uci
         useTimer = true;
         maxDepth = defaultMaxDepth;
 
-        //hash = hsh::generateHash(board);
-
-        cout << hash << endl;
+        hash = hsh::generateHash(board);
 
         for (unsigned int i = 1; i < tokens.size(); i++)
         {
@@ -172,8 +170,6 @@ namespace uci
         {
             board.Forsyth("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-            hash = hsh::generateHash(board);
-
             if (tokens.size() > 3)
             {
                 if (tokens.at(2) == "moves")
@@ -182,8 +178,6 @@ namespace uci
                     {
                         thc::Move move;
                         move.TerseIn(&board, tokens.at(i).c_str());
-
-                        hsh::updateHash(hash, board, move);
 
                         board.PlayMove(move);
                     }
@@ -205,8 +199,6 @@ namespace uci
 
             board.Forsyth(fen.c_str());
 
-            hash = hsh::generateHash(board);
-
             if (tokens.size() > 8)
             {
                 for (int i = 9; i < tokens.size(); i++)
@@ -214,14 +206,10 @@ namespace uci
                     thc::Move move;
                     move.TerseIn(&board, tokens.at(i).c_str());
 
-                    hsh::updateHash(hash, board, move);
-
                     board.PlayMove(move);
                 }
             }
         }
-
-        cout << hash << endl;
     }
 
     void loop()

@@ -181,7 +181,7 @@ namespace hsh
         return hash;
     }
 
-    void updateHash(uint64_t &hash, thc::ChessRules &board, thc::Move &move)
+    uint64_t updateHash(uint64_t hash, thc::ChessRules &board, thc::Move &move)
     {
         hash ^= blackToMove;
 
@@ -189,8 +189,6 @@ namespace hsh
         {
             hash ^= enPassantFile[previousEnPassantFile];
         }
-
-        cout << previousEnPassantFile << endl;
 
         previousEnPassantFile = -1;
 
@@ -476,5 +474,7 @@ namespace hsh
             }
             }
         }
+
+        return hash;
     }
 }
