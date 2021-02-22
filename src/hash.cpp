@@ -32,6 +32,8 @@ namespace hsh
 
     uint64_t blackToMove;
 
+    int previousEnPassantFile;
+
     uint64_t getRandomNumber(uint32_t seed)
     {
         mt19937_64 gen(seed);
@@ -144,16 +146,9 @@ namespace hsh
             }
         }
 
-        for (int rank = 0; rank < 8; rank++)
+        if (board.enpassant_target != 64)
         {
-            for (int file = 0; file < 8; file++)
-            {
-                if (board.enpassant_target == rank * 8 + file)
-                {
-                    hash ^= enPassantFile[file];
-                    break;
-                }
-            }
+            hash ^= enPassantFile[board.enpassant_target % 8];
         }
 
         if (board.wking == 1)
@@ -252,6 +247,19 @@ namespace hsh
                 hash ^= whitePawn[move.dst];
             }
 
+            // valid en passant
+            else if (move.special == thc::SPECIAL_WPAWN_2SQUARES)
+            {
+                hash ^= enPassantFile[move.dst % 8];
+            }
+
+            // en passant
+            else if (move.special == thc::SPECIAL_WEN_PASSANT)
+            {
+                hash ^= blackPawn[move.dst + 8];
+                hash ^= whitePawn[move.dst];
+            }
+
             // promotion
             else if (move.special == thc::SPECIAL_PROMOTION_QUEEN)
             {
@@ -314,6 +322,19 @@ namespace hsh
                 hash ^= blackPawn[move.dst];
             }
 
+            // valid en passant
+            else if (move.special == thc::SPECIAL_BPAWN_2SQUARES)
+            {
+                hash ^= enPassantFile[move.dst % 8];
+            }
+
+            // en passant
+            else if (move.special == thc::SPECIAL_BEN_PASSANT)
+            {
+                hash ^= whitePawn[move.dst - 8];
+                hash ^= blackPawn[move.dst];
+            }
+
             // promotion
             else if (move.special == thc::SPECIAL_PROMOTION_QUEEN)
             {
@@ -370,21 +391,8 @@ namespace hsh
         }
         }
 
-        // en passant
-        if (move.special == thc::SPECIAL_WEN_PASSANT)
-        {
-            hash ^= blackPawn[move.dst + 8];
-            hash ^= enPassantFile[move.dst % 8];
-        }
-
-        else if (move.special == thc::SPECIAL_BEN_PASSANT)
-        {
-            hash ^= whitePawn[move.dst - 8];
-            hash ^= enPassantFile[move.dst % 8];
-        }
-
         // capture
-        else if (board.squares[move.dst] != ' ')
+        if (board.squares[move.dst] != ' ')
         {
             switch (board.squares[move.dst])
             {
