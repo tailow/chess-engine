@@ -32,6 +32,8 @@ namespace hsh
 
     uint64_t blackToMove;
 
+    int previousEnPassantFile = -1;
+
     uint64_t getRandomNumber(uint32_t seed)
     {
         mt19937_64 gen(seed);
@@ -144,16 +146,11 @@ namespace hsh
             }
         }
 
-        for (int rank = 0; rank < 8; rank++)
+        if (board.enpassant_target != 64)
         {
-            for (int file = 0; file < 8; file++)
-            {
-                if (board.enpassant_target == rank * 8 + file)
-                {
-                    hash ^= enPassantFile[file];
-                    break;
-                }
-            }
+            hash ^= enPassantFile[board.enpassant_target % 8];
+
+            previousEnPassantFile = board.enpassant_target % 8;
         }
 
         if (board.wking == 1)
@@ -184,38 +181,65 @@ namespace hsh
         return hash;
     }
 
-    void updateHash(uint64_t &hash, thc::ChessRules &board, thc::Move &move)
+    uint64_t updateHash(uint64_t hash, thc::ChessRules &board, thc::Move &move)
     {
         hash ^= blackToMove;
 
-        // promotion
-
-        // en passant
-
-        // castle
-
-        // king move
-        if (move.special == thc::SPECIAL_KING_MOVE)
+        if (previousEnPassantFile != -1)
         {
-            if (board.white)
-            {
-                hash ^= whiteShortCastle;
-                hash ^= whiteLongCastle;
-            }
-
-            else
-            {
-                hash ^= blackShortCastle;
-                hash ^= blackLongCastle;
-            }
+            hash ^= enPassantFile[previousEnPassantFile];
         }
+
+        previousEnPassantFile = -1;
 
         switch (board.squares[move.src])
         {
         case 'P':
         {
             hash ^= whitePawn[move.src];
-            hash ^= whitePawn[move.dst];
+
+            if (move.special == thc::NOT_SPECIAL)
+            {
+                hash ^= whitePawn[move.dst];
+            }
+
+            // valid en passant
+            else if (move.special == thc::SPECIAL_WPAWN_2SQUARES)
+            {
+                hash ^= enPassantFile[move.dst % 8];
+                hash ^= whitePawn[move.dst];
+
+                previousEnPassantFile = move.dst % 8;
+            }
+
+            // en passant
+            else if (move.special == thc::SPECIAL_WEN_PASSANT)
+            {
+                hash ^= blackPawn[move.dst + 8];
+                hash ^= whitePawn[move.dst];
+            }
+
+            // promotion
+            else if (move.special == thc::SPECIAL_PROMOTION_QUEEN)
+            {
+                hash ^= whiteQueen[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_KNIGHT)
+            {
+                hash ^= whiteKnight[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_BISHOP)
+            {
+                hash ^= whiteBishop[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_ROOK)
+            {
+                hash ^= whiteRook[move.dst];
+            }
+
             break;
         }
         case 'N':
@@ -234,6 +258,17 @@ namespace hsh
         {
             hash ^= whiteRook[move.src];
             hash ^= whiteRook[move.dst];
+
+            if (board.wking_allowed() && move.src == 63)
+            {
+                hash ^= whiteShortCastle;
+            }
+
+            else if (board.wqueen_allowed() && move.src == 56)
+            {
+                hash ^= whiteLongCastle;
+            }
+
             break;
         }
         case 'Q':
@@ -246,12 +281,78 @@ namespace hsh
         {
             hash ^= whiteKing[move.src];
             hash ^= whiteKing[move.dst];
+
+            // castle
+            if (move.special == thc::SPECIAL_WK_CASTLING)
+            {
+                hash ^= whiteRook[63];
+                hash ^= whiteRook[61];
+            }
+
+            else if (move.special == thc::SPECIAL_WQ_CASTLING)
+            {
+                hash ^= whiteRook[56];
+                hash ^= whiteRook[59];
+            }
+
+            if (board.wking_allowed())
+            {
+                hash ^= whiteShortCastle;
+            }
+
+            if (board.wqueen_allowed())
+            {
+                hash ^= whiteLongCastle;
+            }
+
             break;
         }
         case 'p':
         {
             hash ^= blackPawn[move.src];
-            hash ^= blackPawn[move.dst];
+
+            if (move.special == thc::NOT_SPECIAL)
+            {
+                hash ^= blackPawn[move.dst];
+            }
+
+            // valid en passant
+            else if (move.special == thc::SPECIAL_BPAWN_2SQUARES)
+            {
+                hash ^= enPassantFile[move.dst % 8];
+                hash ^= blackPawn[move.dst];
+
+                previousEnPassantFile = move.dst % 8;
+            }
+
+            // en passant
+            else if (move.special == thc::SPECIAL_BEN_PASSANT)
+            {
+                hash ^= whitePawn[move.dst - 8];
+                hash ^= blackPawn[move.dst];
+            }
+
+            // promotion
+            else if (move.special == thc::SPECIAL_PROMOTION_QUEEN)
+            {
+                hash ^= blackQueen[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_KNIGHT)
+            {
+                hash ^= blackKnight[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_BISHOP)
+            {
+                hash ^= blackBishop[move.dst];
+            }
+
+            else if (move.special == thc::SPECIAL_PROMOTION_ROOK)
+            {
+                hash ^= blackRook[move.dst];
+            }
+
             break;
         }
         case 'n':
@@ -270,6 +371,17 @@ namespace hsh
         {
             hash ^= blackRook[move.src];
             hash ^= blackRook[move.dst];
+
+            if (board.bking_allowed() && move.src == 7)
+            {
+                hash ^= blackShortCastle;
+            }
+
+            else if (board.bqueen_allowed() && move.src == 0)
+            {
+                hash ^= blackLongCastle;
+            }
+
             break;
         }
         case 'q':
@@ -282,6 +394,29 @@ namespace hsh
         {
             hash ^= blackKing[move.src];
             hash ^= blackKing[move.dst];
+
+            if (move.special == thc::SPECIAL_BK_CASTLING)
+            {
+                hash ^= blackRook[7];
+                hash ^= blackRook[5];
+            }
+
+            else if (move.special == thc::SPECIAL_BQ_CASTLING)
+            {
+                hash ^= blackRook[0];
+                hash ^= blackRook[3];
+            }
+
+            if (board.bking_allowed())
+            {
+                hash ^= blackShortCastle;
+            }
+
+            if (board.bqueen_allowed())
+            {
+                hash ^= blackLongCastle;
+            }
+
             break;
         }
         }
@@ -289,7 +424,6 @@ namespace hsh
         // capture
         if (board.squares[move.dst] != ' ')
         {
-            cout << "capture" << endl;
             switch (board.squares[move.dst])
             {
             case 'P':
@@ -354,5 +488,7 @@ namespace hsh
             }
             }
         }
+
+        return hash;
     }
 }
