@@ -97,6 +97,16 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
         }
     }
 
+    /*
+    if (ply == 1)
+    {
+        for (int i = 0; i < scores.size(); i++)
+        {
+            cout << scores.at(i) << " " << legalMoves.at(i).TerseOut() << endl;
+        }
+    }
+    */
+
     return legalMoves;
 }
 
