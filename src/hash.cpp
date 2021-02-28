@@ -203,7 +203,7 @@ namespace hsh
                 hash ^= whitePawn[move.dst];
             }
 
-            // valid en passant
+            // valid en passant file
             else if (move.special == thc::SPECIAL_WPAWN_2SQUARES)
             {
                 hash ^= enPassantFile[move.dst % 8];
@@ -316,7 +316,7 @@ namespace hsh
                 hash ^= blackPawn[move.dst];
             }
 
-            // valid en passant
+            // valid en passant file
             else if (move.special == thc::SPECIAL_BPAWN_2SQUARES)
             {
                 hash ^= enPassantFile[move.dst % 8];
