@@ -1,2 +1,2 @@
 # Seggz engine
-A C++ UCI chess engine
+A C++ UCI chess engine.
