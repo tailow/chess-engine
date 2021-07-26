@@ -49,7 +49,6 @@ struct Node
 };
 
 int nodes;
-int hashCollisions;
 
 // max hash size in mb
 const unsigned int MAX_HASH = 1024;
@@ -70,6 +69,7 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
 
     vector<float> scores(legalMoves.size(), -100000);
 
+    // pv move to front
     for (int i = 0; i < legalMoves.size(); i++)
     {
         if (legalMoves[i] == pv[ply])
@@ -85,11 +85,10 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
     {
         for (int i = j + 1; i < legalMoves.size(); i++)
         {
-            //Node node = transpositionTable[board.Hash64Update(hash, legalMoves[i]) % TT_MAX_SIZE];
             Node node = transpositionTable[hsh::updateHash(hash, board, legalMoves[i]) % TT_MAX_SIZE];
 
             // if stored move score is better
-            if (node.score != 0 && -node.score > scores[j])
+            if (node.bestMove.TerseOut() != "0000" && -node.score > scores[j])
             {
                 scores[j] = -node.score;
 
@@ -97,6 +96,16 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
             }
         }
     }
+
+    /*
+    if (ply == 1)
+    {
+        for (int i = 0; i < scores.size(); i++)
+        {
+            cout << scores.at(i) << " " << legalMoves.at(i).TerseOut() << endl;
+        }
+    }
+    */
 
     return legalMoves;
 }
@@ -188,10 +197,12 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     for (int i = 0; i < legalMoves.size(); i++)
     {
         thc::ChessRules childBoard = board;
+
+        uint64_t childHash = hsh::updateHash(hash, board, legalMoves[i]);
+
         childBoard.PlayMove(legalMoves[i]);
 
-        //Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, board.Hash64Update(hash, legalMoves[i]));
-        Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, hsh::updateHash(hash, board, legalMoves[i]));
+        Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, childHash);
 
         if (-child.score > node.score)
         {
@@ -264,7 +275,6 @@ vector<thc::Move> getPv(uint64_t hash, uint8_t depth, thc::ChessRules board)
         {
             pv.push_back(node.bestMove);
 
-            //hash = board.Hash64Update(hash, node.bestMove);
             hash = hsh::updateHash(hash, board, node.bestMove);
 
             board.PlayMove(node.bestMove);
@@ -275,7 +285,7 @@ vector<thc::Move> getPv(uint64_t hash, uint8_t depth, thc::ChessRules board)
 }
 
 // searches and prints out best move and stats
-void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
+void search(thc::ChessRules board, uint8_t maxDepth)
 {
     uci::searching = true;
 
@@ -287,6 +297,8 @@ void search(thc::ChessRules board, uint8_t maxDepth, uint64_t hash)
 
     Node node;
     Node prevNode;
+
+    uint64_t hash = hsh::generateHash(board);
 
     for (int depth = 1; depth <= maxDepth; depth++)
     {

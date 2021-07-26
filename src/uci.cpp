@@ -9,7 +9,6 @@
 #include "search.h"
 #include "evaluate.h"
 #include "timeman.h"
-#include "hash.h"
 
 using namespace std;
 
@@ -23,8 +22,6 @@ namespace uci
     int timeLeft = 60000;
     int timeControl = 0;
     int increment = 0;
-
-    uint64_t hash;
 
     bool searching = false;
     bool pondering = false;
@@ -63,8 +60,6 @@ namespace uci
     {
         useTimer = true;
         maxDepth = defaultMaxDepth;
-
-        hash = hsh::generateHash(board);
 
         for (unsigned int i = 1; i < tokens.size(); i++)
         {
@@ -121,7 +116,7 @@ namespace uci
 
         // start a new searcher thread if ponder move was not played
         if (!ponderHit)
-            searcher = thread(search, board, maxDepth, hash);
+            searcher = thread(search, board, maxDepth);
 
         if (useTimer)
         {

@@ -148,7 +148,7 @@ namespace hsh
 
         if (board.enpassant_target != 64)
         {
-            hash ^= enPassantFile[board.enpassant_target % 8];
+            //hash ^= enPassantFile[board.enpassant_target % 8];
 
             previousEnPassantFile = board.enpassant_target % 8;
         }
@@ -185,9 +185,9 @@ namespace hsh
     {
         hash ^= blackToMove;
 
-        if (previousEnPassantFile != -1)
+        if (board.enpassant_target != 64 && previousEnPassantFile != -1)
         {
-            hash ^= enPassantFile[previousEnPassantFile];
+            //hash ^= enPassantFile[previousEnPassantFile];
         }
 
         previousEnPassantFile = -1;
@@ -203,10 +203,10 @@ namespace hsh
                 hash ^= whitePawn[move.dst];
             }
 
-            // valid en passant
+            // valid en passant file
             else if (move.special == thc::SPECIAL_WPAWN_2SQUARES)
             {
-                hash ^= enPassantFile[move.dst % 8];
+                //hash ^= enPassantFile[move.dst % 8];
                 hash ^= whitePawn[move.dst];
 
                 previousEnPassantFile = move.dst % 8;
@@ -316,10 +316,10 @@ namespace hsh
                 hash ^= blackPawn[move.dst];
             }
 
-            // valid en passant
+            // valid en passant file
             else if (move.special == thc::SPECIAL_BPAWN_2SQUARES)
             {
-                hash ^= enPassantFile[move.dst % 8];
+                //hash ^= enPassantFile[move.dst % 8];
                 hash ^= blackPawn[move.dst];
 
                 previousEnPassantFile = move.dst % 8;
