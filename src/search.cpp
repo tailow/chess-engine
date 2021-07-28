@@ -53,6 +53,7 @@ int nodes;
 // max hash size in mb
 const unsigned int MAX_HASH = 1024;
 
+// transposition table max size
 const size_t TT_MAX_SIZE = MAX_HASH * 1000000 / sizeof(Node);
 
 array<Node, TT_MAX_SIZE> transpositionTable;
@@ -64,6 +65,7 @@ vector<thc::Move> getLegalMoves(vector<thc::Move> &pv, int &ply, uint64_t &hash,
 
     board.GenLegalMoveList(legalMoves);
 
+    // if no principal variation saved for ply
     if (ply >= pv.size())
         return legalMoves;
 
@@ -118,6 +120,7 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
     if (!uci::searching)
         return node;
 
+    // transposition table index for hash
     int index = hash % TT_MAX_SIZE;
 
     double alphaOrig = alpha;
@@ -148,17 +151,19 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
         }
     }
 
+    // check if draw
     thc::DRAWTYPE drawType;
     board.IsDraw(true, drawType);
 
-    // repetition
-    if (drawType != thc::NOT_DRAW && drawType != thc::DRAWTYPE_INSUFFICIENT)
+    // draw
+    if (drawType != thc::NOT_DRAW)
     {
         node.score = 0;
 
         return node;
     }
 
+    // evaluate board state at last ply
     if (depth == 0)
     {
         node.score = color * evaluate(board);
@@ -194,6 +199,7 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
     node.score = -1000000;
 
+    // check all legal moves
     for (int i = 0; i < legalMoves.size(); i++)
     {
         thc::ChessRules childBoard = board;
@@ -202,13 +208,16 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
 
         childBoard.PlayMove(legalMoves[i]);
 
+        // evaluate move
         Node child = negamax(childBoard, depth - 1, -beta, -alpha, -color, ply + 1, pv, childHash);
 
+        // if move is better than current best
         if (-child.score > node.score)
         {
             node.score = -child.score;
             node.bestMove = legalMoves[i];
 
+            // if move leads to mate
             if (child.isMate || child.mate != 0)
             {
                 if (child.mate < 0)
@@ -225,6 +234,7 @@ Node negamax(thc::ChessRules &board, uint8_t depth, float alpha, float beta, int
             }
         }
 
+        // alpha-beta pruning
         alpha = max(alpha, node.score);
 
         if (alpha >= beta)
@@ -271,6 +281,7 @@ vector<thc::Move> getPv(uint64_t hash, uint8_t depth, thc::ChessRules board)
     {
         Node node = transpositionTable[hash % TT_MAX_SIZE];
 
+        // if best move exists
         if (node.bestMove.TerseOut() != "0000")
         {
             pv.push_back(node.bestMove);

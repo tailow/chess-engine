@@ -11,6 +11,7 @@ float evaluate(thc::ChessRules &board)
     bool wkingSafety = true;
     bool bkingSafety = true;
 
+    // check each square
     for (int rank = 0; rank < 8; rank++)
     {
         for (int file = 0; file < 8; file++)

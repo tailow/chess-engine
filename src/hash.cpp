@@ -34,6 +34,7 @@ namespace hsh
 
     int previousEnPassantFile = -1;
 
+    // generate randon 64 bit number
     uint64_t getRandomNumber(uint32_t seed)
     {
         mt19937_64 gen(seed);
@@ -43,6 +44,7 @@ namespace hsh
         return randomNumber;
     }
 
+    // set hashes for each piece in every position, and special moves
     void generateRandomNumbers()
     {
         for (int i = 0; i < 64; i++)
@@ -75,6 +77,7 @@ namespace hsh
         blackToMove = getRandomNumber(2004);
     }
 
+    // generate 64 bit hash of board state
     uint64_t generateHash(thc::ChessRules &board)
     {
         uint64_t hash = 0;
@@ -153,26 +156,31 @@ namespace hsh
             previousEnPassantFile = board.enpassant_target % 8;
         }
 
+        // white short castle allowed
         if (board.wking == 1)
         {
             hash ^= whiteShortCastle;
         }
 
+        // white long castle allowed
         if (board.wqueen == 1)
         {
             hash ^= whiteLongCastle;
         }
 
+        // black short castle allowed
         if (board.bking == 1)
         {
             hash ^= blackShortCastle;
         }
 
+        // black long castle allowed
         if (board.bqueen == 1)
         {
             hash ^= blackLongCastle;
         }
 
+        // black to move
         if (!board.white)
         {
             hash ^= blackToMove;
@@ -183,8 +191,10 @@ namespace hsh
 
     uint64_t updateHash(uint64_t hash, thc::ChessRules &board, thc::Move &move)
     {
+        // switch turn
         hash ^= blackToMove;
 
+        // en passant allowed on file
         if (board.enpassant_target != 64 && previousEnPassantFile != -1)
         {
             //hash ^= enPassantFile[previousEnPassantFile];
@@ -192,6 +202,7 @@ namespace hsh
 
         previousEnPassantFile = -1;
 
+        // which piece made previous move
         switch (board.squares[move.src])
         {
         case 'P':
@@ -259,6 +270,7 @@ namespace hsh
             hash ^= whiteRook[move.src];
             hash ^= whiteRook[move.dst];
 
+            // castling blocked
             if (board.wking_allowed() && move.src == 63)
             {
                 hash ^= whiteShortCastle;
