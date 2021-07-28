@@ -22,6 +22,7 @@ namespace uci
     int timeLeft = 60000;
     int timeControl = 0;
     int increment = 0;
+    int searchTime;
 
     bool searching = false;
     bool pondering = false;
@@ -83,6 +84,11 @@ namespace uci
                 increment = stoi(tokens.at(i + 1));
             }
 
+            else if (tokens.at(i) == "movetime")
+            {
+                searchTime = stoi(tokens.at(i + 1));
+            }
+
             else if (tokens.at(i) == "infinite")
             {
                 maxDepth = 100;
@@ -103,6 +109,11 @@ namespace uci
             }
         }
 
+        if (searchTime == 0)
+        {
+            searchTime = min(timeControl / 30 + increment, timeLeft / 2);
+        }
+
         if (timeControl == 0 || timeLeft > timeControl)
         {
             timeControl = timeLeft;
@@ -120,7 +131,7 @@ namespace uci
 
         if (useTimer)
         {
-            timer = thread(timeman, timeControl, timeLeft, increment);
+            timer = thread(timeman, searchTime);
         }
 
         ponderHit = false;

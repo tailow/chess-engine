@@ -1,3 +1,3 @@
 #pragma once
 
-void timeman(int timeControl, int timeLeft, int increment);
+void timeman(int searchTime);
